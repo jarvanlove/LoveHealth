@@ -55,6 +55,7 @@
 
 #### Minio配置
 
+- 下载地址：https://minio.org.cn/download.shtml
 - 服务端端口：9001 
 - API端口：9000
 - 用户名：admin
