@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 心率记录</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 60px;
+        }
+        .header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #FF9966, #FF5E62);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            color: white;
+        }
+        .header-back {
+            margin-right: 12px;
+            font-size: 20px;
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            flex: 1;
+            text-align: center;
+        }
+        .header-more {
+            font-size: 20px;
+        }
+        .heart-summary {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .summary-date {
+            font-size: 14px;
+            color: #969799;
+            margin-bottom: 24px;
+        }
+        .heart-rate-circle {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+        .circle-bg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #f7f8fa;
+            position: relative;
+        }
+        .circle-progress {
+            width: 85%;
+            height: 85%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: conic-gradient(#FF5E62 0%, #FF9966 60%, #f7f8fa 60%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .circle-inner {
+            width: 80%;
+            height: 80%;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .heart-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #FF5E62;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .heart-unit {
+            font-size: 14px;
+            color: #969799;
+        }
+        .heart-icon {
+            position: absolute;
+            font-size: 20px;
+            color: #FF5E62;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .heart-stats {
+            display: flex;
+            margin-top: 20px;
+            border-top: 1px solid #f2f3f5;
+            padding-top: 20px;
+        }
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 0 8px;
+        }
+        .stat-item:not(:last-child) {
+            border-right: 1px solid #f2f3f5;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #969799;
+        }
+        .time-range {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .range-button {
+            padding: 6px 12px;
+            margin: 0 4px;
+            font-size: 14px;
+            border-radius: 16px;
+            background: #f2f3f5;
+            color: #646566;
+        }
+        .range-button.active {
+            background: #FF9966;
+            color: white;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .chart-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .chart-container {
+            height: 200px;
+            position: relative;
+            margin: 0 -16px;
+            padding: 0 16px;
+            overflow: hidden;
+        }
+        .chart-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+        .grid-line {
+            flex: 1;
+            border-top: 1px dashed #f2f3f5;
+            position: relative;
+        }
+        .grid-line:first-child {
+            border-top: none;
+        }
+        .grid-label {
+            position: absolute;
+            left: 0;
+            top: -8px;
+            font-size: 10px;
+            color: #c8c9cc;
+        }
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .category-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .category-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .category-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .category-item:last-child {
+            border-bottom: none;
+        }
+        .category-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin-right: 12px;
+        }
+        .category-name {
+            flex: 1;
+            font-size: 14px;
+            color: #323233;
+        }
+        .category-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #323233;
+        }
+        .category-percent {
+            width: 60px;
+            font-size: 12px;
+            color: #969799;
+            text-align: right;
+        }
+        .analysis-card {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .analysis-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .analysis-content {
+            font-size: 14px;
+            color: #646566;
+            line-height: 1.6;
+        }
+        .history-card {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .history-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .history-more {
+            font-size: 14px;
+            color: #FF9966;
+        }
+        .history-item {
+            display: flex;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .history-date {
+            flex: 1;
+        }
+        .history-day {
+            font-size: 16px;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .history-time {
+            font-size: 12px;
+            color: #969799;
+        }
+        .history-rate {
+            display: flex;
+            align-items: center;
+        }
+        .history-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #323233;
+            margin-right: 4px;
+        }
+        .history-trend {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+        .trend-up {
+            color: #ee0a24;
+        }
+        .trend-down {
+            color: #07c160;
+        }
+        .measure-button {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF9966, #FF5E62);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(255, 94, 98, 0.4);
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            background: white;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            color: #969799;
+            font-size: 12px;
+        }
+        .nav-item.active {
+            color: #FF5E62;
+        }
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <i class="van-icon van-icon-arrow-left header-back" onclick="location.href='健康数据概览.html'"></i>
+            <div class="header-title">心率记录</div>
+            <i class="van-icon van-icon-ellipsis header-more"></i>
+        </div>
+        
+        <div class="heart-summary">
+            <div class="summary-date">2023年7月8日</div>
+            
+            <div class="heart-rate-circle">
+                <div class="circle-bg">
+                    <div class="circle-progress">
+                        <div class="circle-inner">
+                            <div class="heart-value">75</div>
+                            <div class="heart-unit">次/分钟</div>
+                        </div>
+                    </div>
+                </div>
+                <i class="van-icon van-icon-like heart-icon" style="top: 25%; left: 70%;"></i>
+            </div>
+            
+            <div class="heart-stats">
+                <div class="stat-item">
+                    <div class="stat-value">98</div>
+                    <div class="stat-label">最高心率</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">75</div>
+                    <div class="stat-label">平均心率</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">62</div>
+                    <div class="stat-label">最低心率</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="time-range">
+            <div class="range-button">日</div>
+            <div class="range-button active">周</div>
+            <div class="range-button">月</div>
+            <div class="range-button">年</div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-title">心率趋势</div>
+            
+            <div class="chart-container">
+                <div class="chart-grid">
+                    <div class="grid-line">
+                        <span class="grid-label">100次/分</span>
+                    </div>
+                    <div class="grid-line">
+                        <span class="grid-label">80次/分</span>
+                    </div>
+                    <div class="grid-line">
+                        <span class="grid-label">60次/分</span>
+                    </div>
+                    <div class="grid-line">
+                        <span class="grid-label">40次/分</span>
+                    </div>
+                </div>
+                
+                <svg class="chart-line" viewBox="0 0 300 200" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#FF5E62" />
+                            <stop offset="100%" stop-color="#FF9966" stop-opacity="0.2" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M0,50 Q30,30 60,50 T120,60 T180,30 T240,70 T300,50" stroke="#FF5E62" stroke-width="2" fill="none"/>
+                    <path d="M0,50 Q30,30 60,50 T120,60 T180,30 T240,70 T300,50 L300,200 L0,200 Z" fill="url(#gradient)" opacity="0.2"/>
+                    <circle cx="0" cy="50" r="4" fill="white" stroke="#FF5E62" stroke-width="2"/>
+                    <circle cx="60" cy="50" r="4" fill="white" stroke="#FF5E62" stroke-width="2"/>
+                    <circle cx="120" cy="60" r="4" fill="white" stroke="#FF5E62" stroke-width="2"/>
+                    <circle cx="180" cy="30" r="4" fill="white" stroke="#FF5E62" stroke-width="2"/>
+                    <circle cx="240" cy="70" r="4" fill="white" stroke="#FF5E62" stroke-width="2"/>
+                    <circle cx="300" cy="50" r="4" fill="white" stroke="#FF5E62" stroke-width="2"/>
+                </svg>
+            </div>
+        </div>
+        
+        <div class="category-card">
+            <div class="category-title">心率区间分布</div>
+            
+            <div class="category-list">
+                <div class="category-item">
+                    <div class="category-color" style="background: #EF5350;"></div>
+                    <div class="category-name">极限区间（>110次/分）</div>
+                    <div class="category-value">15分钟</div>
+                    <div class="category-percent">10%</div>
+                </div>
+                <div class="category-item">
+                    <div class="category-color" style="background: #FF9966;"></div>
+                    <div class="category-name">无氧区间（90-110次/分）</div>
+                    <div class="category-value">30分钟</div>
+                    <div class="category-percent">20%</div>
+                </div>
+                <div class="category-item">
+                    <div class="category-color" style="background: #FFB74D;"></div>
+                    <div class="category-name">有氧区间（70-90次/分）</div>
+                    <div class="category-value">45分钟</div>
+                    <div class="category-percent">30%</div>
+                </div>
+                <div class="category-item">
+                    <div class="category-color" style="background: #4FC3F7;"></div>
+                    <div class="category-name">燃脂区间（60-70次/分）</div>
+                    <div class="category-value">35分钟</div>
+                    <div class="category-percent">25%</div>
+                </div>
+                <div class="category-item">
+                    <div class="category-color" style="background: #81C784;"></div>
+                    <div class="category-name">休息区间（<60次/分）</div>
+                    <div class="category-value">25分钟</div>
+                    <div class="category-percent">15%</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="analysis-card">
+            <div class="analysis-title">心率分析</div>
+            
+            <div class="analysis-content">
+                <p>您的静息心率处于健康范围内，表明心脏功能良好。今日最高心率出现在下午3点的健身时段，可能与中高强度的有氧运动有关。</p>
+                <p>与上周同期相比，您的平均心率降低了3次/分钟，这是一个积极的变化，显示您的心肺功能有所提升。</p>
+                <p>建议：保持每周至少150分钟的中等强度有氧运动，有助于进一步改善心脏健康。</p>
+            </div>
+        </div>
+        
+        <div class="history-card">
+            <div class="history-header">
+                <div class="history-title">历史记录</div>
+                <div class="history-more">查看全部 <i class="van-icon van-icon-arrow"></i></div>
+            </div>
+            
+            <div class="history-item">
+                <div class="history-date">
+                    <div class="history-day">今天</div>
+                    <div class="history-time">15:30</div>
+                </div>
+                <div class="history-rate">
+                    <div class="history-value">75</div>
+                    <div class="heart-unit">次/分</div>
+                </div>
+            </div>
+            
+            <div class="history-item">
+                <div class="history-date">
+                    <div class="history-day">昨天</div>
+                    <div class="history-time">16:15</div>
+                </div>
+                <div class="history-rate">
+                    <div class="history-value">78</div>
+                    <div class="heart-unit">次/分</div>
+                    <div class="history-trend trend-up">
+                        <i class="van-icon van-icon-arrow-up"></i>
+                        3
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history-item">
+                <div class="history-date">
+                    <div class="history-day">7月6日</div>
+                    <div class="history-time">14:45</div>
+                </div>
+                <div class="history-rate">
+                    <div class="history-value">73</div>
+                    <div class="heart-unit">次/分</div>
+                    <div class="history-trend trend-down">
+                        <i class="van-icon van-icon-arrow-down"></i>
+                        5
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="measure-button">
+        <i class="van-icon van-icon-like"></i>
+    </div>
+    
+    <div class="bottom-nav">
+        <div class="nav-item">
+            <i class="van-icon van-icon-home-o nav-icon"></i>
+            <div>首页</div>
+        </div>
+        <div class="nav-item active">
+            <i class="van-icon van-icon-chart-trending-o nav-icon"></i>
+            <div>健康</div>
+        </div>
+        <div class="nav-item">
+            <i class="van-icon van-icon-shop-o nav-icon"></i>
+            <div>食谱</div>
+        </div>
+        <div class="nav-item">
+            <i class="van-icon van-icon-manager-o nav-icon"></i>
+            <div>我的</div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rangeButtons = document.querySelectorAll('.range-button');
+            rangeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    rangeButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            const headerBack = document.querySelector('.header-back');
+            headerBack.addEventListener('click', function() {
+                window.location.href = '健康数据概览.html';
+            });
+        });
+    </script>
+</body>
+</html> 

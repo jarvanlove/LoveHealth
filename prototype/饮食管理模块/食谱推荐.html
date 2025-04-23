@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 食谱推荐</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 60px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, #1989fa, #39a9ed);
+            color: white;
+            display: flex;
+            align-items: center;
+            height: 56px;
+            padding: 0 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header-back {
+            font-size: 20px;
+            color: white;
+            margin-right: 16px;
+        }
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+        }
+        .header-search {
+            font-size: 20px;
+            padding: 4px;
+        }
+        .content {
+            padding-top: 56px;
+        }
+        .search-bar {
+            background: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .search-input {
+            flex: 1;
+            height: 36px;
+            padding: 8px 12px 8px 36px;
+            background: #f7f8fa;
+            border-radius: 18px;
+            border: none;
+            font-size: 14px;
+            color: #323233;
+            position: relative;
+        }
+        .search-icon {
+            position: absolute;
+            left: 28px;
+            font-size: 16px;
+            color: #969799;
+        }
+        .filter-tabs {
+            display: flex;
+            padding: 12px 16px;
+            background: white;
+            overflow-x: auto;
+            white-space: nowrap;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .filter-tab {
+            padding: 6px 12px;
+            margin-right: 8px;
+            border-radius: 16px;
+            font-size: 14px;
+            color: #646566;
+            background: #f7f8fa;
+        }
+        .filter-tab.active {
+            background: #1989fa;
+            color: white;
+        }
+        .slider {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+        .slider-item {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #1989fa, #39a9ed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            padding-bottom: 8px;
+        }
+        .title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+        }
+        .more {
+            font-size: 14px;
+            color: #1989fa;
+        }
+        .recipe-list {
+            padding: 0 16px 16px;
+        }
+        .recipe-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .recipe-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        .recipe-info {
+            padding: 12px;
+        }
+        .recipe-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            margin-bottom: 8px;
+        }
+        .recipe-meta {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .recipe-calories {
+            font-size: 14px;
+            color: #ee0a24;
+            margin-right: 12px;
+        }
+        .recipe-time {
+            font-size: 14px;
+            color: #646566;
+            display: flex;
+            align-items: center;
+        }
+        .time-icon {
+            font-size: 14px;
+            margin-right: 4px;
+        }
+        .recipe-tags {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .recipe-tag {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-bottom: 4px;
+            background: #f7f8fa;
+            color: #646566;
+        }
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            padding: 8px 16px 16px;
+            gap: 12px;
+        }
+        .category {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1989fa, #39a9ed);
+            color: white;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .category-name {
+            font-size: 12px;
+            color: #323233;
+            text-align: center;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            display: flex;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #646566;
+            font-size: 12px;
+        }
+        .nav-item.active {
+            color: #1989fa;
+        }
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <i class="van-icon van-icon-arrow-left header-back" onclick="window.history.back()"></i>
+            <div class="header-title">食谱推荐</div>
+            <div class="header-search">
+                <i class="van-icon van-icon-search"></i>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="search-bar">
+                <i class="van-icon van-icon-search search-icon"></i>
+                <input type="text" placeholder="搜索健康食谱" class="search-input">
+            </div>
+            
+            <div class="filter-tabs">
+                <div class="filter-tab active">全部</div>
+                <div class="filter-tab">减脂</div>
+                <div class="filter-tab">增肌</div>
+                <div class="filter-tab">低碳水</div>
+                <div class="filter-tab">高蛋白</div>
+                <div class="filter-tab">素食</div>
+                <div class="filter-tab">无麸质</div>
+                <div class="filter-tab">低糖</div>
+            </div>
+            
+            <div class="slider">
+                <div class="slider-item">健康食谱，美味生活</div>
+            </div>
+            
+            <div class="categories">
+                <div class="category">
+                    <div class="category-icon">
+                        <i class="van-icon van-icon-shop-o"></i>
+                    </div>
+                    <div class="category-name">早餐</div>
+                </div>
+                <div class="category">
+                    <div class="category-icon">
+                        <i class="van-icon van-icon-gift-o"></i>
+                    </div>
+                    <div class="category-name">午餐</div>
+                </div>
+                <div class="category">
+                    <div class="category-icon">
+                        <i class="van-icon van-icon-coupon-o"></i>
+                    </div>
+                    <div class="category-name">晚餐</div>
+                </div>
+                <div class="category">
+                    <div class="category-icon">
+                        <i class="van-icon van-icon-smile-o"></i>
+                    </div>
+                    <div class="category-name">小食</div>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <div class="title">热门推荐</div>
+                <div class="more">查看全部</div>
+            </div>
+            
+            <div class="recipe-list">
+                <div class="recipe-item">
+                    <img class="recipe-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360' width='640' height='360'%3E%3Crect width='640' height='360' style='fill:%23B0E0E6'/%3E%3Cellipse cx='320' cy='180' rx='200' ry='100' style='fill:%234682B4'/%3E%3C/svg%3E" alt="健康沙拉">
+                    <div class="recipe-info">
+                        <div class="recipe-title">蔬菜鸡胸肉沙拉</div>
+                        <div class="recipe-meta">
+                            <div class="recipe-calories">320千卡</div>
+                            <div class="recipe-time">
+                                <i class="van-icon van-icon-clock-o time-icon"></i>
+                                15分钟
+                            </div>
+                        </div>
+                        <div class="recipe-tags">
+                            <div class="recipe-tag">高蛋白</div>
+                            <div class="recipe-tag">低脂肪</div>
+                            <div class="recipe-tag">简单</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recipe-item">
+                    <img class="recipe-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360' width='640' height='360'%3E%3Crect width='640' height='360' style='fill:%23FFF8DC'/%3E%3Cellipse cx='320' cy='180' rx='180' ry='100' style='fill:%23DEB887'/%3E%3C/svg%3E" alt="燕麦粥">
+                    <div class="recipe-info">
+                        <div class="recipe-title">混合莓果燕麦粥</div>
+                        <div class="recipe-meta">
+                            <div class="recipe-calories">280千卡</div>
+                            <div class="recipe-time">
+                                <i class="van-icon van-icon-clock-o time-icon"></i>
+                                10分钟
+                            </div>
+                        </div>
+                        <div class="recipe-tags">
+                            <div class="recipe-tag">高纤维</div>
+                            <div class="recipe-tag">早餐</div>
+                            <div class="recipe-tag">简单</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recipe-item">
+                    <img class="recipe-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360' width='640' height='360'%3E%3Crect width='640' height='360' style='fill:%23F5F5DC'/%3E%3Cellipse cx='320' cy='180' rx='160' ry='100' style='fill:%238B4513'/%3E%3C/svg%3E" alt="三文鱼">
+                    <div class="recipe-info">
+                        <div class="recipe-title">香烤三文鱼配藜麦</div>
+                        <div class="recipe-meta">
+                            <div class="recipe-calories">450千卡</div>
+                            <div class="recipe-time">
+                                <i class="van-icon van-icon-clock-o time-icon"></i>
+                                25分钟
+                            </div>
+                        </div>
+                        <div class="recipe-tags">
+                            <div class="recipe-tag">高蛋白</div>
+                            <div class="recipe-tag">欧米茄3</div>
+                            <div class="recipe-tag">晚餐</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <div class="title">季节精选</div>
+                <div class="more">查看全部</div>
+            </div>
+            
+            <div class="recipe-list">
+                <div class="recipe-item">
+                    <img class="recipe-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360' width='640' height='360'%3E%3Crect width='640' height='360' style='fill:%23E6E6FA'/%3E%3Cellipse cx='320' cy='180' rx='190' ry='100' style='fill:%239370DB'/%3E%3C/svg%3E" alt="蓝莓松饼">
+                    <div class="recipe-info">
+                        <div class="recipe-title">全麦蓝莓松饼</div>
+                        <div class="recipe-meta">
+                            <div class="recipe-calories">240千卡</div>
+                            <div class="recipe-time">
+                                <i class="van-icon van-icon-clock-o time-icon"></i>
+                                30分钟
+                            </div>
+                        </div>
+                        <div class="recipe-tags">
+                            <div class="recipe-tag">全麦</div>
+                            <div class="recipe-tag">抗氧化</div>
+                            <div class="recipe-tag">早餐</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recipe-item">
+                    <img class="recipe-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360' width='640' height='360'%3E%3Crect width='640' height='360' style='fill:%23F0F8FF'/%3E%3Cellipse cx='320' cy='180' rx='170' ry='100' style='fill:%2390EE90'/%3E%3C/svg%3E" alt="绿色蔬菜汤">
+                    <div class="recipe-info">
+                        <div class="recipe-title">鲜蔬菠菜汤</div>
+                        <div class="recipe-meta">
+                            <div class="recipe-calories">180千卡</div>
+                            <div class="recipe-time">
+                                <i class="van-icon van-icon-clock-o time-icon"></i>
+                                20分钟
+                            </div>
+                        </div>
+                        <div class="recipe-tags">
+                            <div class="recipe-tag">低热量</div>
+                            <div class="recipe-tag">富含维生素</div>
+                            <div class="recipe-tag">素食</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-home-o"></i>
+                </div>
+                <div>首页</div>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-shop-o"></i>
+                </div>
+                <div>饮食</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-chart-trending-o"></i>
+                </div>
+                <div>统计</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-manager-o"></i>
+                </div>
+                <div>我的</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 点击过滤标签
+            const filterTabs = document.querySelectorAll('.filter-tab');
+            filterTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    filterTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    alert(`已选择${this.textContent}分类`);
+                });
+            });
+            
+            // 点击食谱项
+            const recipeItems = document.querySelectorAll('.recipe-item');
+            recipeItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const title = this.querySelector('.recipe-title').textContent;
+                    alert(`查看${title}的详细食谱`);
+                });
+            });
+            
+            // 点击分类
+            const categories = document.querySelectorAll('.category');
+            categories.forEach(category => {
+                category.addEventListener('click', function() {
+                    const name = this.querySelector('.category-name').textContent;
+                    alert(`查看${name}分类的食谱`);
+                });
+            });
+            
+            // 点击查看全部
+            const moreBtns = document.querySelectorAll('.more');
+            moreBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const title = this.parentElement.querySelector('.title').textContent;
+                    alert(`查看所有${title}`);
+                });
+            });
+            
+            // 搜索框点击
+            document.querySelector('.search-input').addEventListener('click', function() {
+                alert('打开食谱搜索页面');
+            });
+            
+            // 搜索按钮点击
+            document.querySelector('.header-search').addEventListener('click', function() {
+                alert('打开食谱搜索页面');
+            });
+            
+            // 底部导航切换
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    const pages = ['首页', '饮食记录', '统计', '个人中心'];
+                    if (index !== 1) { // 不是当前页面
+                        alert(`导航到${pages[index]}页面`);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

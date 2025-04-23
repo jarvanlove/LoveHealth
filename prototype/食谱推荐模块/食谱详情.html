@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食谱详情 - 爱健康</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333333;
+            line-height: 1.5;
+        }
+        .page-container {
+            padding-bottom: 60px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background-color: transparent;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+        .header-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .cover-swiper {
+            width: 100%;
+            height: 250px;
+        }
+        .swiper-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .recipe-info {
+            margin-top: -20px;
+            border-radius: 20px 20px 0 0;
+            background-color: #fff;
+            padding: 20px 16px;
+            position: relative;
+            z-index: 10;
+        }
+        .recipe-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 8px;
+        }
+        .author-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .author {
+            display: flex;
+            align-items: center;
+        }
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .author-name {
+            font-size: 14px;
+            color: #333333;
+        }
+        .follow-btn {
+            padding: 4px 12px;
+            background-color: #FF4B4B;
+            color: #fff;
+            border-radius: 16px;
+            font-size: 12px;
+        }
+        .followed-btn {
+            padding: 3px 11px;
+            background-color: #fff;
+            color: #999999;
+            border: 1px solid #EEEEEE;
+            border-radius: 16px;
+            font-size: 12px;
+        }
+        .recipe-meta {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 0;
+            border-top: 1px solid #EEEEEE;
+            border-bottom: 1px solid #EEEEEE;
+            margin-bottom: 20px;
+        }
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .meta-label {
+            font-size: 12px;
+            color: #999999;
+            margin-bottom: 4px;
+        }
+        .meta-value {
+            font-size: 16px;
+            color: #333333;
+            font-weight: 500;
+        }
+        .meta-value.easy {
+            color: #4CAF50;
+        }
+        .meta-value.medium {
+            color: #FF9800;
+        }
+        .meta-value.hard {
+            color: #F44336;
+        }
+        .content-section {
+            background-color: #fff;
+            margin-top: 12px;
+            padding: 16px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            background-color: #FF4B4B;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        .recipe-desc {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .ingredients-list {
+            padding-left: 16px;
+        }
+        .ingredient-group {
+            margin-bottom: 16px;
+        }
+        .group-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 8px;
+        }
+        .ingredient-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .ingredient-name {
+            font-size: 14px;
+            color: #333333;
+            display: flex;
+            align-items: center;
+        }
+        .ingredient-checkbox {
+            margin-right: 8px;
+        }
+        .ingredient-amount {
+            font-size: 14px;
+            color: #999999;
+        }
+        .steps-list {
+            counter-reset: step-counter;
+        }
+        .step-item {
+            display: flex;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .step-number {
+            min-width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #FF4B4B;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-right: 12px;
+            margin-top: 2px;
+        }
+        .step-content {
+            flex: 1;
+        }
+        .step-text {
+            font-size: 14px;
+            color: #333333;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .step-img {
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .nutrition-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+        }
+        .nutrition-table th {
+            background-color: #FFEBEB;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+        }
+        .nutrition-table td {
+            padding: 10px;
+            font-size: 14px;
+            color: #666666;
+            border-bottom: 1px solid #EEEEEE;
+        }
+        .nutrition-table tr:last-child td {
+            border-bottom: none;
+        }
+        .tips-card {
+            background-color: #FFF9E6;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+        .tips-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .tips-icon {
+            font-size: 16px;
+            color: #FF9800;
+            margin-right: 4px;
+        }
+        .tips-content {
+            font-size: 13px;
+            color: #666666;
+            line-height: 1.6;
+        }
+        .related-recipes {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            gap: 12px;
+        }
+        .related-recipe {
+            flex: 0 0 180px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .related-cover {
+            width: 100%;
+            height: 120px;
+        }
+        .related-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .related-info {
+            padding: 8px;
+        }
+        .related-title {
+            font-size: 14px;
+            color: #333333;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .related-meta {
+            font-size: 12px;
+            color: #999999;
+            display: flex;
+            justify-content: space-between;
+        }
+        .comment-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #EEEEEE;
+        }
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .comment-user {
+            display: flex;
+            align-items: center;
+        }
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .comment-user-name {
+            font-size: 14px;
+            color: #333333;
+        }
+        .comment-time {
+            font-size: 12px;
+            color: #999999;
+        }
+        .comment-content {
+            font-size: 14px;
+            color: #333333;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .comment-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .comment-like {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #999999;
+            margin-right: 16px;
+        }
+        .comment-like-icon {
+            font-size: 16px;
+            margin-right: 4px;
+        }
+        .comment-reply {
+            font-size: 12px;
+            color: #999999;
+        }
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .comment-input {
+            flex: 1;
+            height: 36px;
+            background-color: #f5f5f5;
+            border-radius: 18px;
+            padding: 0 12px;
+            font-size: 14px;
+            color: #999999;
+            display: flex;
+            align-items: center;
+        }
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            margin-left: 16px;
+        }
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: 16px;
+            font-size: 20px;
+            color: #999999;
+        }
+        .action-btn.active {
+            color: #FF4B4B;
+        }
+        .action-text {
+            font-size: 10px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="page-container">
+            <div class="header">
+                <div class="header-button" @click="goBack">
+                    <van-icon name="arrow-left" />
+                </div>
+                <div class="header-button" @click="showActions">
+                    <van-icon name="ellipsis" />
+                </div>
+            </div>
+            
+            <van-swipe class="cover-swiper" :autoplay="3000" indicator-color="#FF4B4B">
+                <van-swipe-item v-for="(image, index) in recipeImages" :key="index">
+                    <img :src="image" class="swiper-img" />
+                </van-swipe-item>
+            </van-swipe>
+            
+            <div class="recipe-info">
+                <h1 class="recipe-title">香煎三文鱼配芦笋：Omega-3脂肪酸的绝佳来源</h1>
+                
+                <div class="author-row">
+                    <div class="author">
+                        <img src="https://img.yzcdn.cn/vant/cat.jpeg" class="author-avatar" alt="作者头像" />
+                        <span class="author-name">美食达人李厨</span>
+                    </div>
+                    <div class="follow-btn" v-if="!isFollowing" @click="followAuthor">关注</div>
+                    <div class="followed-btn" v-else @click="unfollowAuthor">已关注</div>
+                </div>
+                
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">难度</span>
+                        <span class="meta-value medium">中等</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">烹饪时间</span>
+                        <span class="meta-value">25分钟</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">份量</span>
+                        <span class="meta-value">2人份</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">热量</span>
+                        <span class="meta-value">320千卡/份</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3 class="section-title">简介</h3>
+                <p class="recipe-desc">三文鱼富含优质Omega-3脂肪酸，有助于心脑血管健康。搭配芦笋等绿色蔬菜，营养均衡，口感鲜美。这道菜品制作简单，但营养价值极高，特别适合注重健康饮食的人士。</p>
+                <p class="recipe-desc">三文鱼皮煎至酥脆，肉质鲜嫩多汁，搭配微脆的芦笋，口感丰富，层次分明。柠檬汁的提味让整道菜更加清新爽口，非常适合春夏季节食用。</p>
+            </div>
+            
+            <div class="content-section">
+                <h3 class="section-title">食材清单</h3>
+                <div class="ingredients-list">
+                    <div class="ingredient-group">
+                        <h4 class="group-title">主料</h4>
+                        <div class="ingredient-item" v-for="(item, index) in mainIngredients" :key="'main-'+index">
+                            <label class="ingredient-name">
+                                <van-checkbox 
+                                    v-model="item.checked" 
+                                    shape="square" 
+                                    class="ingredient-checkbox"
+                                    icon-size="16px"
+                                    checked-color="#FF4B4B"
+                                ></van-checkbox>
+                                {{ item.name }}
+                            </label>
+                            <span class="ingredient-amount">{{ item.amount }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ingredient-group">
+                        <h4 class="group-title">调料</h4>
+                        <div class="ingredient-item" v-for="(item, index) in seasonings" :key="'season-'+index">
+                            <label class="ingredient-name">
+                                <van-checkbox 
+                                    v-model="item.checked" 
+                                    shape="square" 
+                                    class="ingredient-checkbox"
+                                    icon-size="16px"
+                                    checked-color="#FF4B4B"
+                                ></van-checkbox>
+                                {{ item.name }}
+                            </label>
+                            <span class="ingredient-amount">{{ item.amount }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3 class="section-title">烹饪步骤</h3>
+                <div class="steps-list">
+                    <div class="step-item" v-for="(step, index) in cookingSteps" :key="index">
+                        <div class="step-number">{{ index + 1 }}</div>
+                        <div class="step-content">
+                            <p class="step-text">{{ step.text }}</p>
+                            <img v-if="step.image" :src="step.image" class="step-img" :alt="`步骤${index+1}`" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3 class="section-title">营养成分</h3>
+                <table class="nutrition-table">
+                    <tr>
+                        <th>营养素</th>
+                        <th>含量</th>
+                        <th>占每日推荐值%</th>
+                    </tr>
+                    <tr v-for="(item, index) in nutritionFacts" :key="index">
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.amount }}</td>
+                        <td>{{ item.percentage }}</td>
+                    </tr>
+                </table>
+                
+                <div class="tips-card">
+                    <h4 class="tips-title">
+                        <van-icon name="info-o" class="tips-icon" />
+                        小贴士
+                    </h4>
+                    <div class="tips-content">
+                        <p>1. 三文鱼表面擦干水分再下锅，可以避免油溅并保证皮部酥脆。</p>
+                        <p>2. 选择新鲜的三文鱼时，肉质应该富有弹性，颜色鲜亮，没有强烈的腥味。</p>
+                        <p>3. 芦笋去掉老根部后，可以用削皮器轻轻刮去下部较老的外皮，口感会更好。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3 class="section-title">相关推荐</h3>
+                <div class="related-recipes">
+                    <div class="related-recipe" v-for="(recipe, index) in relatedRecipes" :key="index" @click="viewRecipe(recipe.id)">
+                        <div class="related-cover">
+                            <img :src="recipe.cover" :alt="recipe.title" />
+                        </div>
+                        <div class="related-info">
+                            <div class="related-title">{{ recipe.title }}</div>
+                            <div class="related-meta">
+                                <span>{{ recipe.difficulty }}</span>
+                                <span>{{ recipe.time }}分钟</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3 class="section-title">评论 ({{ comments.length }})</h3>
+                <div v-if="comments.length === 0" style="text-align: center; padding: 20px 0; color: #999;">
+                    暂无评论，来说说你的看法吧
+                </div>
+                <div v-else class="comments-list">
+                    <div class="comment-item" v-for="(comment, index) in comments" :key="index">
+                        <div class="comment-header">
+                            <div class="comment-user">
+                                <img :src="comment.avatar" class="comment-avatar" :alt="comment.username" />
+                                <span class="comment-user-name">{{ comment.username }}</span>
+                            </div>
+                            <span class="comment-time">{{ comment.time }}</span>
+                        </div>
+                        <p class="comment-content">{{ comment.content }}</p>
+                        <div class="comment-actions">
+                            <div class="comment-like" @click="likeComment(index)">
+                                <van-icon 
+                                    :name="comment.isLiked ? 'like' : 'like-o'" 
+                                    class="comment-like-icon"
+                                    :color="comment.isLiked ? '#FF4B4B' : '#999999'"
+                                />
+                                <span>{{ comment.likes }}</span>
+                            </div>
+                            <div class="comment-reply" @click="replyComment(comment)">回复</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bottom-bar">
+                <div class="comment-input" @click="focusComment">
+                    <span>写评论...</span>
+                </div>
+                <div class="action-buttons">
+                    <div 
+                        class="action-btn" 
+                        :class="{ active: isLiked }"
+                        @click="toggleLike"
+                    >
+                        <van-icon :name="isLiked ? 'like' : 'like-o'" />
+                        <span class="action-text">{{ likeCount }}</span>
+                    </div>
+                    <div 
+                        class="action-btn" 
+                        :class="{ active: isCollected }"
+                        @click="toggleCollect"
+                    >
+                        <van-icon :name="isCollected ? 'star' : 'star-o'" />
+                        <span class="action-text">收藏</span>
+                    </div>
+                    <div class="action-btn" @click="shareRecipe">
+                        <van-icon name="share-o" />
+                        <span class="action-text">分享</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp, ref, reactive } = Vue;
+        
+        createApp({
+            setup() {
+                const isFollowing = ref(false);
+                const isLiked = ref(false);
+                const likeCount = ref(219);
+                const isCollected = ref(false);
+                
+                const recipeImages = ref([
+                    'https://img.yzcdn.cn/vant/cat.jpeg',
+                    'https://img.yzcdn.cn/vant/cat.jpeg',
+                    'https://img.yzcdn.cn/vant/cat.jpeg'
+                ]);
+                
+                const mainIngredients = ref([
+                    { name: '三文鱼排', amount: '2块（约300克）', checked: false },
+                    { name: '芦笋', amount: '10-12根', checked: false },
+                    { name: '小番茄', amount: '6个', checked: false },
+                    { name: '橄榄油', amount: '2大匙', checked: false }
+                ]);
+                
+                const seasonings = ref([
+                    { name: '海盐', amount: '适量', checked: false },
+                    { name: '黑胡椒', amount: '适量', checked: false },
+                    { name: '柠檬', amount: '半个', checked: false },
+                    { name: '大蒜', amount: '2瓣', checked: false },
+                    { name: '迷迭香', amount: '少许（可选）', checked: false }
+                ]);
+                
+                const cookingSteps = ref([
+                    { 
+                        text: '三文鱼用厨房纸擦干水分，两面均匀撒上海盐和黑胡椒腌制10分钟。', 
+                        image: 'https://img.yzcdn.cn/vant/cat.jpeg' 
+                    },
+                    { 
+                        text: '芦笋洗净，切去老根部分约1-2厘米，沸水中焯烫1分钟后捞出，立即放入冰水中冷却，沥干水分备用。', 
+                        image: null
+                    },
+                    { 
+                        text: '平底锅中加入1大匙橄榄油，中火加热至油微微冒烟，放入三文鱼，皮朝下煎约3-4分钟至金黄酥脆。', 
+                        image: 'https://img.yzcdn.cn/vant/cat.jpeg' 
+                    },
+                    { 
+                        text: '翻面后再煎2-3分钟，根据个人喜好可以调整煎制时间（全熟或略带粉色的半熟）。煎好后取出备用。', 
+                        image: null 
+                    },
+                    { 
+                        text: '同一锅中加入剩余的橄榄油，放入切片的大蒜和迷迭香稍微煸炒出香味，然后加入芦笋翻炒1-2分钟。', 
+                        image: null 
+                    },
+                    { 
+                        text: '将小番茄对半切开，加入锅中快速翻炒10秒。挤入半个柠檬的汁，翻拌均匀。', 
+                        image: 'https://img.yzcdn.cn/vant/cat.jpeg' 
+                    },
+                    { 
+                        text: '将煎好的三文鱼和炒好的芦笋、番茄一起摆盘，可再撒少许黑胡椒提味，装饰以柠檬片即可。', 
+                        image: 'https://img.yzcdn.cn/vant/cat.jpeg' 
+                    }
+                ]);
+                
+                const nutritionFacts = ref([
+                    { name: '热量', amount: '320千卡', percentage: '16%' },
+                    { name: '蛋白质', amount: '24克', percentage: '48%' },
+                    { name: '脂肪', amount: '22克', percentage: '34%' },
+                    { name: 'Omega-3脂肪酸', amount: '3.2克', percentage: '320%' },
+                    { name: '碳水化合物', amount: '8克', percentage: '3%' },
+                    { name: '纤维素', amount: '3克', percentage: '12%' },
+                    { name: '钙', amount: '120毫克', percentage: '12%' },
+                    { name: '铁', amount: '1.8毫克', percentage: '10%' },
+                    { name: '维生素D', amount: '11微克', percentage: '55%' }
+                ]);
+                
+                const relatedRecipes = ref([
+                    {
+                        id: 1,
+                        title: '地中海烤鱼',
+                        cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                        difficulty: '中等',
+                        time: 35
+                    },
+                    {
+                        id: 2,
+                        title: '芦笋培根卷',
+                        cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                        difficulty: '简单',
+                        time: 15
+                    },
+                    {
+                        id: 3,
+                        title: '柠檬香煎鲈鱼',
+                        cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                        difficulty: '中等',
+                        time: 25
+                    }
+                ]);
+                
+                const comments = ref([
+                    {
+                        username: '美食探索者',
+                        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                        content: '做了这道菜，真的很棒！三文鱼煎得恰到好处，外酥里嫩，和芦笋的搭配非常和谐。我额外加了一些意大利香草，味道更丰富了。',
+                        time: '3天前',
+                        likes: 24,
+                        isLiked: false
+                    },
+                    {
+                        username: '健身达人',
+                        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                        content: '作为健身党的加餐非常合适，高蛋白低碳水，而且烹饪简单快捷。不过我觉得三文鱼可以再煎短一点时间，保持一点粉色会更鲜嫩。',
+                        time: '1周前',
+                        likes: 18,
+                        isLiked: true
+                    }
+                ]);
+                
+                const followAuthor = () => {
+                    isFollowing.value = true;
+                    vant.showToast('关注成功');
+                };
+                
+                const unfollowAuthor = () => {
+                    isFollowing.value = false;
+                    vant.showToast('已取消关注');
+                };
+                
+                const toggleLike = () => {
+                    isLiked.value = !isLiked.value;
+                    if (isLiked.value) {
+                        likeCount.value++;
+                    } else {
+                        likeCount.value--;
+                    }
+                };
+                
+                const toggleCollect = () => {
+                    isCollected.value = !isCollected.value;
+                    if (isCollected.value) {
+                        vant.showToast('收藏成功');
+                    } else {
+                        vant.showToast('已取消收藏');
+                    }
+                };
+                
+                const shareRecipe = () => {
+                    vant.showShareSheet({
+                        options: [
+                            { name: '微信', icon: 'wechat' },
+                            { name: '朋友圈', icon: 'wechat-moments' },
+                            { name: '微博', icon: 'weibo' },
+                            { name: '复制链接', icon: 'link' },
+                            { name: '分享海报', icon: 'poster' },
+                            { name: '二维码', icon: 'qrcode' },
+                        ],
+                        onSelect(option) {
+                            vant.showToast(option.name);
+                        },
+                    });
+                };
+                
+                const showActions = () => {
+                    vant.showActionSheet({
+                        actions: [
+                            { name: '收藏' },
+                            { name: '举报' },
+                            { name: '不感兴趣' }
+                        ],
+                        onSelect: (action) => {
+                            vant.showToast(action.name);
+                        }
+                    });
+                };
+                
+                const likeComment = (index) => {
+                    const comment = comments.value[index];
+                    comment.isLiked = !comment.isLiked;
+                    if (comment.isLiked) {
+                        comment.likes++;
+                    } else {
+                        comment.likes--;
+                    }
+                };
+                
+                const replyComment = (comment) => {
+                    vant.showToast(`回复: ${comment.username}`);
+                };
+                
+                const focusComment = () => {
+                    vant.showToast('打开评论框');
+                };
+                
+                const viewRecipe = (id) => {
+                    vant.showToast(`查看食谱: ${id}`);
+                };
+                
+                const goBack = () => {
+                    history.back();
+                };
+                
+                return {
+                    isFollowing,
+                    isLiked,
+                    likeCount,
+                    isCollected,
+                    recipeImages,
+                    mainIngredients,
+                    seasonings,
+                    cookingSteps,
+                    nutritionFacts,
+                    relatedRecipes,
+                    comments,
+                    followAuthor,
+                    unfollowAuthor,
+                    toggleLike,
+                    toggleCollect,
+                    shareRecipe,
+                    showActions,
+                    likeComment,
+                    replyComment,
+                    focusComment,
+                    viewRecipe,
+                    goBack
+                };
+            }
+        }).use(vant).mount('#app');
+    </script>
+</body>
+</html> 

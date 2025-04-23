@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 搜索</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .search-container {
+            padding: 12px 16px;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+        .back-icon {
+            font-size: 20px;
+            color: #323233;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 8px 12px;
+        }
+        .search-icon {
+            color: #969799;
+            margin-right: 5px;
+        }
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            color: #323233;
+        }
+        .cancel-btn {
+            font-size: 14px;
+            color: #323233;
+            margin-left: 12px;
+            white-space: nowrap;
+        }
+        .history-section {
+            padding: 16px;
+            background: #fff;
+            margin-bottom: 10px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #323233;
+        }
+        .clear-btn {
+            font-size: 14px;
+            color: #969799;
+        }
+        .history-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .history-tag {
+            padding: 8px 16px;
+            background: #f2f3f5;
+            border-radius: 16px;
+            font-size: 13px;
+            color: #323233;
+        }
+        .hot-search-section {
+            padding: 16px;
+            background: #fff;
+        }
+        .hot-search-list {
+            margin-top: 12px;
+        }
+        .hot-search-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f2f2f2;
+        }
+        .hot-search-rank {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+            margin-right: 12px;
+            color: #fff;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .rank-1, .rank-2, .rank-3 {
+            background: linear-gradient(135deg, #FF9966, #FF5E62);
+        }
+        .rank-other {
+            background: #e8e8e8;
+            color: #969799;
+        }
+        .hot-search-name {
+            flex: 1;
+            font-size: 14px;
+            color: #323233;
+        }
+        .hot-search-tag {
+            font-size: 12px;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            background: linear-gradient(90deg, #36d1dc, #5b86e5);
+        }
+        .search-result {
+            display: none;
+            padding: 16px;
+        }
+        .category-tabs {
+            display: flex;
+            background: #fff;
+            border-bottom: 1px solid #f2f2f2;
+            margin-bottom: 10px;
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+        }
+        .category-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 14px;
+            color: #323233;
+            position: relative;
+        }
+        .category-tab.active {
+            color: #5b86e5;
+            font-weight: bold;
+        }
+        .category-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: #5b86e5;
+            border-radius: 3px;
+        }
+        .result-list {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .result-item {
+            display: flex;
+            padding: 12px;
+            border-bottom: 1px solid #f2f2f2;
+        }
+        .result-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            object-fit: cover;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .result-content {
+            flex: 1;
+        }
+        .result-title {
+            font-size: 15px;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .result-desc {
+            font-size: 13px;
+            color: #969799;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .result-tag {
+            display: inline-block;
+            font-size: 11px;
+            color: #5b86e5;
+            background: rgba(91, 134, 229, 0.1);
+            border-radius: 4px;
+            padding: 2px 6px;
+        }
+        .empty-state {
+            padding: 40px 0;
+            text-align: center;
+            color: #969799;
+        }
+        .empty-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+            color: #dcdee0;
+        }
+        .empty-text {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <a href="首页.html" class="back-icon">
+            <i class="van-icon van-icon-arrow-left"></i>
+        </a>
+        <div class="search-box">
+            <i class="van-icon van-icon-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="搜索食物、运动、健康资讯..." id="searchInput">
+            <i class="van-icon van-icon-clear" id="clearBtn" style="display: none; color: #c8c9cc; margin-left: 5px;"></i>
+        </div>
+        <div class="cancel-btn" id="cancelBtn">取消</div>
+    </div>
+    
+    <div id="searchInitial">
+        <div class="history-section">
+            <div class="section-header">
+                <div class="section-title">最近搜索</div>
+                <div class="clear-btn" id="clearHistoryBtn">
+                    <i class="van-icon van-icon-delete"></i> 清空
+                </div>
+            </div>
+            <div class="history-tags">
+                <div class="history-tag">减肥食谱</div>
+                <div class="history-tag">瑜伽教程</div>
+                <div class="history-tag">健康breakfast</div>
+                <div class="history-tag">低热量零食</div>
+                <div class="history-tag">高蛋白食物</div>
+            </div>
+        </div>
+        
+        <div class="hot-search-section">
+            <div class="section-title">热门搜索</div>
+            <div class="hot-search-list">
+                <div class="hot-search-item">
+                    <div class="hot-search-rank rank-1">1</div>
+                    <div class="hot-search-name">每日8杯水真的有必要吗</div>
+                    <div class="hot-search-tag">热门</div>
+                </div>
+                <div class="hot-search-item">
+                    <div class="hot-search-rank rank-2">2</div>
+                    <div class="hot-search-name">如何科学减脂不反弹</div>
+                </div>
+                <div class="hot-search-item">
+                    <div class="hot-search-rank rank-3">3</div>
+                    <div class="hot-search-name">轻断食饮食法</div>
+                </div>
+                <div class="hot-search-item">
+                    <div class="hot-search-rank rank-other">4</div>
+                    <div class="hot-search-name">瑜伽初学者入门</div>
+                </div>
+                <div class="hot-search-item">
+                    <div class="hot-search-rank rank-other">5</div>
+                    <div class="hot-search-name">低碳水饮食</div>
+                </div>
+                <div class="hot-search-item">
+                    <div class="hot-search-rank rank-other">6</div>
+                    <div class="hot-search-name">HIIT训练计划</div>
+                </div>
+                <div class="hot-search-item">
+                    <div class="hot-search-rank rank-other">7</div>
+                    <div class="hot-search-name">膳食纤维食物排行</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="searchResult" class="search-result">
+        <div class="category-tabs">
+            <div class="category-tab active">全部</div>
+            <div class="category-tab">食物</div>
+            <div class="category-tab">运动</div>
+            <div class="category-tab">资讯</div>
+            <div class="category-tab">社区</div>
+        </div>
+        
+        <div id="resultContent">
+            <div class="result-list">
+                <div class="result-item" onclick="location.href='../饮食管理模块/食物详情.html'">
+                    <img src="https://img.freepik.com/free-photo/fresh-avocado-wooden-table_1150-45192.jpg?w=1380&t=st=1687870993~exp=1687871593~hmac=55aa911b2b19cace1ea5cff4c60d1ebc04fe2b7bd9f86abb386fe9375b484e0c" alt="牛油果" class="result-image">
+                    <div class="result-content">
+                        <div class="result-title">牛油果</div>
+                        <div class="result-desc">富含健康脂肪、维生素E和膳食纤维，有助于心脏健康和血压控制。</div>
+                        <div class="result-tag">食物</div>
+                    </div>
+                </div>
+                
+                <div class="result-item" onclick="location.href='../运动健身模块/运动详情.html'">
+                    <img src="https://img.freepik.com/free-photo/trainer-explaining-woman-how-training-with-ball_651396-1240.jpg?w=1380&t=st=1687871076~exp=1687871676~hmac=0a75b2d3b23f53a53a42d5e7a7a910f7bd4f59b10060d6bfbc5ee5909d702040" alt="普拉提" class="result-image">
+                    <div class="result-content">
+                        <div class="result-title">普拉提入门教程</div>
+                        <div class="result-desc">初学者友好的普拉提训练，帮助提高核心力量和身体柔韧性，改善姿态。</div>
+                        <div class="result-tag">运动</div>
+                    </div>
+                </div>
+                
+                <div class="result-item" onclick="location.href='../健康资讯模块/资讯详情.html'">
+                    <img src="https://img.freepik.com/free-photo/top-view-ketogenic-diet-concept_23-2148184859.jpg?w=1380&t=st=1687871137~exp=1687871737~hmac=8cba633a61d8bb2cd954600e9b47f4b5e15bbbeec66f41e3db5d2aac2c02c0b9" alt="低碳水饮食" class="result-image">
+                    <div class="result-content">
+                        <div class="result-title">低碳水饮食的科学解析</div>
+                        <div class="result-desc">专业营养师解读低碳水饮食法的优缺点，适合人群和注意事项。</div>
+                        <div class="result-tag">资讯</div>
+                    </div>
+                </div>
+                
+                <div class="result-item" onclick="location.href='../社区模块/帖子详情.html'">
+                    <img src="https://img.freepik.com/free-photo/closeup-picture-people-having-their-breakfast_329181-3715.jpg?w=1380&t=st=1687871173~exp=1687871773~hmac=a5cda52fa3b0fb5e1ac1546c03fe6ff23f6d44a3de52a3a0e84f3cbe6ac93f68" alt="社区讨论" class="result-image">
+                    <div class="result-content">
+                        <div class="result-title">分享我的健康早餐打卡30天心得</div>
+                        <div class="result-desc">坚持一个月的健康早餐，分享我的食谱和身体变化...</div>
+                        <div class="result-tag">社区</div>
+                    </div>
+                </div>
+                
+                <div class="result-item" onclick="location.href='../饮食管理模块/食谱详情.html'">
+                    <img src="https://img.freepik.com/free-photo/vegan-breakfast-quinoa-bowl-with-strawberries_24972-2266.jpg?w=1380&t=st=1687871214~exp=1687871814~hmac=7fd00a6d8f9b86ac0ae4c74dd5cb4ad5a56c32d2b4e02d8a4dc319b7c3e9ae73" alt="健康早餐" class="result-image">
+                    <div class="result-content">
+                        <div class="result-title">藜麦水果能量碗</div>
+                        <div class="result-desc">营养丰富的早餐选择，含有蛋白质、膳食纤维和抗氧化物质。</div>
+                        <div class="result-tag">食谱</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="emptyResult" style="display: none;">
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="van-icon van-icon-search"></i>
+                </div>
+                <div class="empty-text">没有找到相关内容</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+            const searchInitial = document.getElementById('searchInitial');
+            const searchResult = document.getElementById('searchResult');
+            const resultContent = document.getElementById('resultContent');
+            const emptyResult = document.getElementById('emptyResult');
+            const historyTags = document.querySelectorAll('.history-tag');
+            const hotSearchItems = document.querySelectorAll('.hot-search-item');
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            
+            // 清除按钮显示/隐藏
+            searchInput.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    clearBtn.style.display = 'block';
+                } else {
+                    clearBtn.style.display = 'none';
+                    searchInitial.style.display = 'block';
+                    searchResult.style.display = 'none';
+                }
+            });
+            
+            // 清除输入
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                clearBtn.style.display = 'none';
+                searchInitial.style.display = 'block';
+                searchResult.style.display = 'none';
+            });
+            
+            // 取消按钮
+            cancelBtn.addEventListener('click', function() {
+                window.location.href = '首页.html';
+            });
+            
+            // 清空搜索历史
+            clearHistoryBtn.addEventListener('click', function() {
+                vant.showDialog({
+                    title: '提示',
+                    message: '确定要清空搜索历史吗？',
+                    showCancelButton: true,
+                }).then(({ confirm }) => {
+                    if (confirm) {
+                        document.querySelector('.history-tags').innerHTML = '';
+                        vant.showToast('已清空搜索历史');
+                    }
+                });
+            });
+            
+            // 搜索历史标签点击
+            historyTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    searchInput.value = this.textContent;
+                    clearBtn.style.display = 'block';
+                    performSearch();
+                });
+            });
+            
+            // 热门搜索项点击
+            hotSearchItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const keyword = this.querySelector('.hot-search-name').textContent;
+                    searchInput.value = keyword;
+                    clearBtn.style.display = 'block';
+                    performSearch();
+                });
+            });
+            
+            // 分类标签切换
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    if (this.textContent === '全部') {
+                        resultContent.style.display = 'block';
+                        emptyResult.style.display = 'none';
+                    } else if (this.textContent === '社区') {
+                        resultContent.style.display = 'block';
+                        // 这里可以根据实际需要显示不同的结果
+                    } else if (this.textContent === '运动') {
+                        resultContent.style.display = 'block';
+                        // 这里可以根据实际需要显示不同的结果
+                    } else {
+                        // 模拟一些分类没有结果的情况
+                        resultContent.style.display = 'none';
+                        emptyResult.style.display = 'block';
+                    }
+                });
+            });
+            
+            // 执行搜索
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            function performSearch() {
+                if (searchInput.value.trim() === '') return;
+                
+                searchInitial.style.display = 'none';
+                searchResult.style.display = 'block';
+                
+                // 这里可以发送实际的搜索请求
+                // 为了演示，我们直接显示预设的结果
+                resultContent.style.display = 'block';
+                emptyResult.style.display = 'none';
+                
+                // 如果搜索特定关键词，可以显示空结果状态
+                if (searchInput.value.trim() === 'notfound') {
+                    resultContent.style.display = 'none';
+                    emptyResult.style.display = 'block';
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

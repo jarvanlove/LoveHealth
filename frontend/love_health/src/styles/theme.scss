@@ -1,0 +1,53 @@
+:root {
+  // 主题色
+  --primary-color: #5CBBF6;
+  --primary-light: #60D7F9;
+  --primary-dark: #4A9CE5;
+  
+  // 功能色
+  --success-color: #07c160;
+  --warning-color: #ff976a;
+  --danger-color: #ee0a24;
+  --info-color: #909399;
+  
+  // 文字颜色
+  --text-primary: #323233;
+  --text-regular: #666666;
+  --text-secondary: #969799;
+  --text-placeholder: #c8c9cc;
+  
+  // 边框颜色
+  --border-color: #ebedf0;
+  --border-light: #f2f3f5;
+  --border-dark: #dcdee0;
+  
+  // 背景颜色
+  --background-color: #f8f9fa;
+  --background-light: #ffffff;
+  --background-dark: #f2f3f5;
+  
+  // 间距
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  
+  // 圆角
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  
+  // 字体大小
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  
+  // 动画
+  --animation-duration: 0.3s;
+  --animation-timing-function: ease-in-out;
+} 

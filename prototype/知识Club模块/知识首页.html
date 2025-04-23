@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识Club - 爱健康</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #323233;
+            line-height: 1.5;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background-color: #fff;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #FF4B4B;
+        }
+        .search-box {
+            flex: 1;
+            margin: 0 12px;
+        }
+        .action-icon {
+            font-size: 22px;
+            color: #969799;
+        }
+        .container {
+            padding: 56px 0 50px;
+        }
+        .category-section {
+            padding: 16px;
+            background-color: #fff;
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #333333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .more-link {
+            font-size: 14px;
+            color: #999999;
+            font-weight: normal;
+        }
+        .category-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #FFEBEB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+        }
+        .category-name {
+            font-size: 12px;
+            color: #666666;
+        }
+        .article-section {
+            margin-top: 12px;
+            background-color: #fff;
+            padding: 16px;
+        }
+        .article-list {
+            margin-top: 12px;
+        }
+        .article-item {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #EEEEEE;
+        }
+        .article-item:last-child {
+            border-bottom: none;
+        }
+        .article-cover {
+            width: 100px;
+            height: 70px;
+            border-radius: 4px;
+            object-fit: cover;
+            margin-right: 12px;
+            background-color: #f5f5f5;
+        }
+        .article-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .article-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .article-meta {
+            font-size: 12px;
+            color: #999999;
+            display: flex;
+            align-items: center;
+        }
+        .article-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            background-color: #FFEBEB;
+            color: #FF4B4B;
+            border-radius: 2px;
+            font-size: 10px;
+            margin-right: 8px;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            height: 50px;
+            background-color: #fff;
+            box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #646566;
+            font-size: 10px;
+        }
+        .nav-item.active {
+            color: #FF4B4B;
+        }
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+        .tab-container {
+            margin-top: 12px;
+            background-color: #fff;
+        }
+        .banner-container {
+            padding: 16px;
+            background-color: #fff;
+        }
+        .banner-img {
+            width: 100%;
+            height: 120px;
+            border-radius: 8px;
+            object-fit: cover;
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <div class="header-title">知识Club</div>
+            <div class="search-box" @click="showSearch">
+                <van-search
+                    placeholder="搜索健康知识、疾病、饮食..."
+                    disabled
+                    shape="round"
+                    background="transparent"
+                ></van-search>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="banner-container">
+                <div class="banner-img" style="background: linear-gradient(to right, #FF4B4B 0%, #FF7676 100%);">
+                    <!-- 这里可以放banner图 -->
+                </div>
+            </div>
+
+            <div class="category-section">
+                <div class="section-title">
+                    <span>健康知识分类</span>
+                    <span class="more-link">全部分类 ></span>
+                </div>
+                <div class="category-list">
+                    <div class="category-item" v-for="category in categories" @click="goToCategory(category.id)">
+                        <div class="category-icon" :style="{backgroundColor: category.bgColor}">
+                            <van-icon :name="category.icon" color="#FF4B4B" size="24" />
+                        </div>
+                        <div class="category-name">{{ category.name }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-container">
+                <van-tabs v-model:active="activeTab" animated swipeable color="#FF4B4B">
+                    <van-tab title="推荐">
+                        <div class="article-section">
+                            <div class="section-title">
+                                <span>热门推荐</span>
+                                <span class="more-link">更多 ></span>
+                            </div>
+                            <div class="article-list">
+                                <div class="article-item" v-for="article in recommendArticles" @click="goToArticle(article.id)">
+                                    <img :src="article.cover" class="article-cover" />
+                                    <div class="article-info">
+                                        <div class="article-title">{{ article.title }}</div>
+                                        <div class="article-meta">
+                                            <span class="article-tag">{{ article.category }}</span>
+                                            <span>{{ article.views }}阅读</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </van-tab>
+                    <van-tab title="饮食">
+                        <div class="article-section">
+                            <div class="article-list">
+                                <div class="article-item" v-for="article in dietArticles" @click="goToArticle(article.id)">
+                                    <img :src="article.cover" class="article-cover" />
+                                    <div class="article-info">
+                                        <div class="article-title">{{ article.title }}</div>
+                                        <div class="article-meta">
+                                            <span class="article-tag">{{ article.category }}</span>
+                                            <span>{{ article.views }}阅读</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </van-tab>
+                    <van-tab title="运动">
+                        <div class="article-section">
+                            <div class="article-list">
+                                <div class="article-item" v-for="article in exerciseArticles" @click="goToArticle(article.id)">
+                                    <img :src="article.cover" class="article-cover" />
+                                    <div class="article-info">
+                                        <div class="article-title">{{ article.title }}</div>
+                                        <div class="article-meta">
+                                            <span class="article-tag">{{ article.category }}</span>
+                                            <span>{{ article.views }}阅读</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </van-tab>
+                    <van-tab title="睡眠">
+                        <div class="article-section">
+                            <div class="article-list">
+                                <div class="article-item" v-for="article in sleepArticles" @click="goToArticle(article.id)">
+                                    <img :src="article.cover" class="article-cover" />
+                                    <div class="article-info">
+                                        <div class="article-title">{{ article.title }}</div>
+                                        <div class="article-meta">
+                                            <span class="article-tag">{{ article.category }}</span>
+                                            <span>{{ article.views }}阅读</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </van-tab>
+                </van-tabs>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <van-icon name="home-o" class="nav-icon" />
+                <span>首页</span>
+            </div>
+            <div class="nav-item active">
+                <van-icon name="bookmark" class="nav-icon" />
+                <span>知识</span>
+            </div>
+            <div class="nav-item">
+                <van-icon name="friends-o" class="nav-icon" />
+                <span>社区</span>
+            </div>
+            <div class="nav-item">
+                <van-icon name="manager-o" class="nav-icon" />
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref } = Vue;
+        
+        createApp({
+            setup() {
+                const activeTab = ref(0);
+                
+                const categories = ref([
+                    { id: 1, name: '饮食营养', icon: 'food-o', bgColor: '#FFEBEB' },
+                    { id: 2, name: '运动健身', icon: 'diamond-o', bgColor: '#FFEBEB' },
+                    { id: 3, name: '睡眠管理', icon: 'hotel-o', bgColor: '#FFEBEB' },
+                    { id: 4, name: '心理健康', icon: 'like-o', bgColor: '#FFEBEB' },
+                    { id: 5, name: '疾病预防', icon: 'shield-o', bgColor: '#FFEBEB' },
+                    { id: 6, name: '常见疾病', icon: 'bag-o', bgColor: '#FFEBEB' },
+                    { id: 7, name: '女性健康', icon: 'smile-o', bgColor: '#FFEBEB' },
+                    { id: 8, name: '男性健康', icon: 'thumb-circle-o', bgColor: '#FFEBEB' }
+                ]);
+                
+                const recommendArticles = ref([
+                    { id: 1, title: '科学健身：如何制定适合自己的运动计划', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '运动健身', views: '1.2万' },
+                    { id: 2, title: '均衡饮食的标准：每日所需营养素解析', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '饮食营养', views: '8562' },
+                    { id: 3, title: '改善睡眠质量的10个实用技巧', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '睡眠管理', views: '6324' }
+                ]);
+                
+                const dietArticles = ref([
+                    { id: 4, title: '低脂饮食：减肥期间应该如何合理安排', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '饮食营养', views: '5647' },
+                    { id: 5, title: '高蛋白食物有哪些？素食者如何补充蛋白质', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '饮食营养', views: '4328' },
+                    { id: 6, title: '常见食物热量表及其营养价值分析', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '饮食营养', views: '3956' }
+                ]);
+                
+                const exerciseArticles = ref([
+                    { id: 7, title: '有氧vs无氧：两种锻炼方式的区别与选择', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '运动健身', views: '4862' },
+                    { id: 8, title: '居家健身：不需要器械的全身训练方案', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '运动健身', views: '3748' },
+                    { id: 9, title: '运动后如何正确拉伸：避免肌肉酸痛的方法', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '运动健身', views: '2936' }
+                ]);
+                
+                const sleepArticles = ref([
+                    { id: 10, title: '睡眠周期解析：了解你的睡眠结构', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '睡眠管理', views: '3625' },
+                    { id: 11, title: '失眠的原因及自然缓解方法', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '睡眠管理', views: '2843' },
+                    { id: 12, title: '睡前放松：帮助入睡的冥想与呼吸技巧', cover: 'https://img.yzcdn.cn/vant/cat.jpeg', category: '睡眠管理', views: '2156' }
+                ]);
+                
+                const showSearch = () => {
+                    vant.showToast('点击了搜索框');
+                };
+                
+                const goToCategory = (id) => {
+                    vant.showToast(`前往分类 ${id}`);
+                };
+                
+                const goToArticle = (id) => {
+                    vant.showToast(`查看文章 ${id}`);
+                    window.location.href = `./文章详情.html?id=${id}`;
+                };
+                
+                return {
+                    activeTab,
+                    categories,
+                    recommendArticles,
+                    dietArticles,
+                    exerciseArticles,
+                    sleepArticles,
+                    showSearch,
+                    goToCategory,
+                    goToArticle
+                };
+            }
+        }).use(vant).mount('#app');
+    </script>
+</body>
+</html> 

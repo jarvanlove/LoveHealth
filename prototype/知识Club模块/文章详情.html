@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章详情 - 爱健康</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333333;
+            line-height: 1.5;
+        }
+        .page-container {
+            padding-bottom: 50px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background-color: #fff;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        .back-icon {
+            font-size: 20px;
+            color: #666666;
+            margin-right: 8px;
+        }
+        .header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .action-icon {
+            font-size: 20px;
+            color: #666666;
+        }
+        .content {
+            padding: 56px 0 0;
+        }
+        .article-container {
+            background-color: #fff;
+            padding: 16px;
+        }
+        .article-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .article-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: #999999;
+        }
+        .meta-left {
+            display: flex;
+            align-items: center;
+        }
+        .article-category {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: #FFEBEB;
+            color: #FF4B4B;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-right: 8px;
+        }
+        .article-date {
+            color: #999999;
+        }
+        .meta-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .views-count {
+            display: flex;
+            align-items: center;
+        }
+        .views-icon {
+            font-size: 14px;
+            margin-right: 2px;
+        }
+        .article-cover {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .article-cover img {
+            width: 100%;
+            object-fit: cover;
+        }
+        .article-content {
+            font-size: 15px;
+            color: #333333;
+            line-height: 1.8;
+        }
+        .article-content p {
+            margin-bottom: 16px;
+        }
+        .article-content h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: #333333;
+        }
+        .article-content img {
+            width: 100%;
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+        .article-content strong {
+            font-weight: 600;
+            color: #FF4B4B;
+        }
+        .article-content ul, .article-content ol {
+            padding-left: a20px;
+            margin-bottom: 16px;
+        }
+        .article-content li {
+            margin-bottom: 8px;
+        }
+        .article-tags {
+            margin: 24px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .article-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background-color: #f5f5f5;
+            color: #666666;
+            border-radius: 16px;
+            font-size: 12px;
+        }
+        .author-section {
+            margin-top: 24px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+        }
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 12px;
+        }
+        .author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .author-info {
+            flex: 1;
+        }
+        .author-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 4px;
+        }
+        .author-desc {
+            font-size: 12px;
+            color: #999999;
+        }
+        .follow-btn {
+            padding: 6px 12px;
+            background-color: #FF4B4B;
+            color: #fff;
+            border-radius: 16px;
+            font-size: 12px;
+        }
+        .followed-btn {
+            padding: 5px 11px;
+            background-color: #fff;
+            color: #666666;
+            border: 1px solid #EEEEEE;
+            border-radius: 16px;
+            font-size: 12px;
+        }
+        .related-section {
+            margin-top: 16px;
+            padding: 16px;
+            background-color: #fff;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 16px;
+            position: relative;
+            padding-left: 12px;
+        }
+        .section-title::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 2px;
+            bottom: 2px;
+            width: 4px;
+            background-color: #FF4B4B;
+            border-radius: 2px;
+        }
+        .related-articles {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 8px;
+        }
+        .related-article {
+            flex: 0 0 70%;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .related-cover {
+            width: 100%;
+            height: 100px;
+            overflow: hidden;
+        }
+        .related-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .related-info {
+            padding: 8px 12px;
+        }
+        .related-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .related-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999999;
+        }
+        .comments-section {
+            margin-top: 16px;
+            padding: 16px;
+            background-color: #fff;
+        }
+        .comment-count {
+            color: #999999;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+        .comment-item {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #EEEEEE;
+        }
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .comment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .comment-content {
+            flex: 1;
+        }
+        .comment-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .comment-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+        }
+        .comment-time {
+            font-size: 12px;
+            color: #999999;
+        }
+        .comment-text {
+            font-size: 14px;
+            color: #333333;
+            line-height: 1.6;
+            margin-bottom: 4px;
+        }
+        .comment-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .comment-like {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #999999;
+        }
+        .comment-reply {
+            font-size: 12px;
+            color: #999999;
+        }
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .comment-input {
+            flex: 1;
+            height: 36px;
+            background-color: #f5f5f5;
+            border-radius: 18px;
+            padding: 0 12px;
+            font-size: 14px;
+            color: #999999;
+            display: flex;
+            align-items: center;
+        }
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-left: 16px;
+        }
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 20px;
+            color: #666666;
+        }
+        .action-btn.active {
+            color: #FF4B4B;
+        }
+        .action-text {
+            font-size: 10px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="page-container">
+            <div class="header">
+                <div class="header-left">
+                    <van-icon name="arrow-left" class="back-icon" @click="goBack" />
+                    <div class="header-title">文章详情</div>
+                </div>
+                <div class="header-right">
+                    <van-icon name="share-o" class="action-icon" @click="shareArticle" />
+                    <van-icon name="ellipsis" class="action-icon" @click="showMoreActions" />
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="article-container">
+                    <h1 class="article-title">改善睡眠质量的10个实用技巧：科学方法帮你告别失眠困扰</h1>
+                    <div class="article-meta">
+                        <div class="meta-left">
+                            <span class="article-category">睡眠管理</span>
+                            <span class="article-date">2023-07-15</span>
+                        </div>
+                        <div class="meta-right">
+                            <span class="views-count">
+                                <van-icon name="eye-o" class="views-icon" />
+                                6324
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-cover">
+                        <img src="https://img.yzcdn.cn/vant/cat.jpeg" alt="睡眠质量改善封面图" />
+                    </div>
+                    
+                    <div class="article-content">
+                        <p>充足且高质量的睡眠对健康至关重要，但现代生活的压力和不良习惯让很多人饱受失眠困扰。本文将分享10个经过科学验证的实用技巧，帮助你改善睡眠质量，告别失眠烦恼。</p>
+                        
+                        <h3>1. 保持规律的睡眠时间表</h3>
+                        <p>即使在周末，也要尽量在固定时间入睡和起床。这有助于调节你的生物钟，使身体形成自然的睡眠-觉醒周期。坚持这一习惯可以显著提高入睡速度和睡眠质量。</p>
+                        
+                        <h3>2. 创造理想的睡眠环境</h3>
+                        <p>理想的睡眠环境应该是<strong>安静、黑暗且温度适宜</strong>的。研究表明，卧室温度保持在18-20°C最有利于睡眠。如有必要，可以使用眼罩、耳塞或白噪音机器来阻隔干扰。</p>
+                        
+                        <img src="https://img.yzcdn.cn/vant/cat.jpeg" alt="理想睡眠环境示意图" />
+                        
+                        <h3>3. 限制睡前电子设备使用</h3>
+                        <p>手机、平板和电脑屏幕发出的蓝光会抑制褪黑素的产生，干扰睡眠。建议在睡前至少30-60分钟停止使用电子设备，或使用蓝光过滤功能。</p>
+                        
+                        <h3>4. 建立睡前放松习惯</h3>
+                        <p>睡前进行放松活动有助于身心过渡到睡眠状态。可以尝试以下方式：</p>
+                        <ul>
+                            <li>热水浴或热淋浴</li>
+                            <li>轻柔的伸展或瑜伽动作</li>
+                            <li>冥想或深呼吸练习</li>
+                            <li>阅读纸质书籍（避免刺激内容）</li>
+                        </ul>
+                        
+                        <h3>5. 注意饮食和运动时间</h3>
+                        <p>睡前3小时内避免大量进食，尤其是油腻、辛辣的食物。咖啡因和酒精都会影响睡眠质量，应在睡前至少6小时避免摄入咖啡因，睡前避免饮酒。</p>
+                        <p>适量运动有助于提高睡眠质量，但应避免在睡前3小时内进行剧烈运动，因为这会提高体温和警觉性。</p>
+                        
+                        <h3>6. 管理压力和焦虑</h3>
+                        <p>白天的压力和焦虑是夜间失眠的常见原因。尝试以下方法来缓解：</p>
+                        <ul>
+                            <li>将担忧写下来，"暂时搁置"到明天处理</li>
+                            <li>练习感恩日记，关注积极的事物</li>
+                            <li>学习正念冥想技巧</li>
+                        </ul>
+                        
+                        <h3>7. 合理使用卧室</h3>
+                        <p>将卧室主要用于睡眠和亲密活动，避免在床上工作、看电视或玩手机。这有助于大脑将卧室环境与睡眠联系起来。</p>
+                        
+                        <h3>8. 避免长时间午睡</h3>
+                        <p>如果你有午睡习惯，建议将时间控制在20-30分钟内，并在下午3点前完成。过长或过晚的午睡会影响夜间睡眠。</p>
+                        
+                        <h3>9. 适当暴露自然光</h3>
+                        <p>白天适当暴露在自然光下有助于调节生物钟。早晨接触阳光特别有效，可以帮助你在晚上更容易入睡。</p>
+                        
+                        <h3>10. 尝试放松技巧应对失眠</h3>
+                        <p>如果躺在床上超过20分钟仍无法入睡，建议起床去另一个房间做些放松活动，直到感到困倦再回到床上。这有助于避免将床与清醒和焦虑联系起来。</p>
+                        
+                        <p>改善睡眠是一个渐进的过程，需要时间和耐心。如果经过一段时间的自我调整后，睡眠问题仍然严重影响生活质量，建议咨询专业医生，排除潜在的睡眠障碍。</p>
+                    </div>
+                    
+                    <div class="article-tags">
+                        <span class="article-tag">#睡眠健康</span>
+                        <span class="article-tag">#失眠对策</span>
+                        <span class="article-tag">#睡眠习惯</span>
+                        <span class="article-tag">#健康生活</span>
+                    </div>
+                    
+                    <div class="author-section">
+                        <div class="author-avatar">
+                            <img src="https://img.yzcdn.cn/vant/cat.jpeg" alt="作者头像" />
+                        </div>
+                        <div class="author-info">
+                            <div class="author-name">张睡眠专家</div>
+                            <div class="author-desc">睡眠医学科医师，专注睡眠健康研究10年</div>
+                        </div>
+                        <div class="follow-btn" v-if="!isFollowing" @click="followAuthor">关注</div>
+                        <div class="followed-btn" v-else @click="unfollowAuthor">已关注</div>
+                    </div>
+                </div>
+                
+                <div class="related-section">
+                    <h3 class="section-title">相关推荐</h3>
+                    <div class="related-articles">
+                        <div class="related-article" v-for="article in relatedArticles" @click="viewArticle(article.id)">
+                            <div class="related-cover">
+                                <img :src="article.cover" :alt="article.title" />
+                            </div>
+                            <div class="related-info">
+                                <div class="related-title">{{ article.title }}</div>
+                                <div class="related-meta">
+                                    <span>{{ article.category }}</span>
+                                    <span>{{ article.views }}阅读</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="comments-section">
+                    <h3 class="section-title">评论 <span class="comment-count">{{ comments.length }}</span></h3>
+                    <div class="comment-list">
+                        <div class="comment-item" v-for="comment in comments">
+                            <div class="comment-avatar">
+                                <img :src="comment.avatar" :alt="comment.name" />
+                            </div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <div class="comment-name">{{ comment.name }}</div>
+                                    <div class="comment-time">{{ comment.time }}</div>
+                                </div>
+                                <div class="comment-text">{{ comment.text }}</div>
+                                <div class="comment-actions">
+                                    <div class="comment-like" @click="likeComment(comment)">
+                                        <van-icon :name="comment.isLiked ? 'like' : 'like-o'" style="margin-right: 4px;" :color="comment.isLiked ? '#FF4B4B' : '#999999'" />
+                                        {{ comment.likes }}
+                                    </div>
+                                    <div class="comment-reply" @click="replyComment(comment)">回复</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bottom-bar">
+                <div class="comment-input" @click="focusCommentInput">
+                    <span>写评论...</span>
+                </div>
+                <div class="action-buttons">
+                    <div class="action-btn" :class="{ active: isLiked }" @click="toggleLike">
+                        <van-icon :name="isLiked ? 'like' : 'like-o'" />
+                        <span class="action-text">{{ likeCount }}</span>
+                    </div>
+                    <div class="action-btn" :class="{ active: isCollected }" @click="toggleCollect">
+                        <van-icon :name="isCollected ? 'star' : 'star-o'" />
+                        <span class="action-text">收藏</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp, ref } = Vue;
+        
+        createApp({
+            setup() {
+                const isFollowing = ref(false);
+                const isLiked = ref(false);
+                const likeCount = ref(128);
+                const isCollected = ref(false);
+                
+                const relatedArticles = ref([
+                    { 
+                        id: 1, 
+                        title: '如何选择合适的枕头：睡眠舒适度大调查', 
+                        cover: 'https://img.yzcdn.cn/vant/cat.jpeg', 
+                        category: '睡眠管理', 
+                        views: '3815' 
+                    },
+                    { 
+                        id: 2, 
+                        title: '睡前放松的5种冥想方法，帮你快速入睡', 
+                        cover: 'https://img.yzcdn.cn/vant/cat.jpeg', 
+                        category: '睡眠管理', 
+                        views: '2547' 
+                    },
+                    { 
+                        id: 3, 
+                        title: '了解睡眠周期：如何获得真正的高质量睡眠', 
+                        cover: 'https://img.yzcdn.cn/vant/cat.jpeg', 
+                        category: '睡眠管理', 
+                        views: '4236' 
+                    }
+                ]);
+                
+                const comments = ref([
+                    {
+                        id: 1,
+                        name: '李睡得好',
+                        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                        text: '感谢分享这些技巧！我最近一直有入睡困难的问题，尝试了第4条建立睡前放松习惯，效果很明显，现在入睡时间从1小时缩短到了15分钟左右。',
+                        time: '3天前',
+                        likes: 24,
+                        isLiked: false
+                    },
+                    {
+                        id: 2,
+                        name: '王失眠',
+                        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                        text: '对我来说，限制电子设备使用是最难做到的一点。工作需要经常看手机，有什么好的替代方法吗？',
+                        time: '2天前',
+                        likes: 15,
+                        isLiked: true
+                    },
+                    {
+                        id: 3,
+                        name: '张健康',
+                        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                        text: '我发现适量运动确实对睡眠有很大帮助，但一定要注意运动时间，太晚运动反而会兴奋。一般我会选择下午4-5点进行有氧运动，睡眠质量明显提高了。',
+                        time: '1天前',
+                        likes: 32,
+                        isLiked: false
+                    }
+                ]);
+                
+                const followAuthor = () => {
+                    isFollowing.value = true;
+                    vant.showToast('关注成功');
+                };
+                
+                const unfollowAuthor = () => {
+                    isFollowing.value = false;
+                    vant.showToast('已取消关注');
+                };
+                
+                const viewArticle = (id) => {
+                    vant.showToast(`查看文章 ${id}`);
+                };
+                
+                const likeComment = (comment) => {
+                    comment.isLiked = !comment.isLiked;
+                    if (comment.isLiked) {
+                        comment.likes++;
+                    } else {
+                        comment.likes--;
+                    }
+                };
+                
+                const replyComment = (comment) => {
+                    vant.showToast(`回复评论: ${comment.name}`);
+                };
+                
+                const toggleLike = () => {
+                    isLiked.value = !isLiked.value;
+                    if (isLiked.value) {
+                        likeCount.value++;
+                    } else {
+                        likeCount.value--;
+                    }
+                };
+                
+                const toggleCollect = () => {
+                    isCollected.value = !isCollected.value;
+                    if (isCollected.value) {
+                        vant.showToast('收藏成功');
+                    } else {
+                        vant.showToast('已取消收藏');
+                    }
+                };
+                
+                const focusCommentInput = () => {
+                    vant.showToast('打开评论输入框');
+                };
+                
+                const shareArticle = () => {
+                    vant.showToast('分享文章');
+                };
+                
+                const showMoreActions = () => {
+                    vant.showActionSheet({
+                        actions: [
+                            { name: '复制链接' },
+                            { name: '举报' },
+                            { name: '不感兴趣' }
+                        ],
+                        onSelect: (action) => {
+                            vant.showToast(action.name);
+                        }
+                    });
+                };
+                
+                const goBack = () => {
+                    history.back();
+                };
+                
+                return {
+                    isFollowing,
+                    isLiked,
+                    likeCount,
+                    isCollected,
+                    relatedArticles,
+                    comments,
+                    followAuthor,
+                    unfollowAuthor,
+                    viewArticle,
+                    likeComment,
+                    replyComment,
+                    toggleLike,
+                    toggleCollect,
+                    focusCommentInput,
+                    shareArticle,
+                    showMoreActions,
+                    goBack
+                };
+            }
+        }).use(vant).mount('#app');
+    </script>
+</body>
+</html> 

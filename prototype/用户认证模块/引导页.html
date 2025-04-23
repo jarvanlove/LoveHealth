@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 引导页</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .guide-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+        .swiper {
+            width: 100%;
+            height: 100%;
+        }
+        .swiper-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+        .slide-image {
+            width: 80%;
+            height: 50%;
+            background-position: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-top: 10vh;
+        }
+        .slide-content {
+            margin-top: 4vh;
+            padding: 0 20px;
+        }
+        .slide-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .slide-desc {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .guide-footer {
+            position: fixed;
+            bottom: 40px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .button-skip {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 5px 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        .button-next {
+            width: 90%;
+            height: 44px;
+            border-radius: 22px;
+            background: linear-gradient(90deg, #FF4B4B, #FF7676);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(255, 75, 75, 0.3);
+        }
+        .swiper-indicator {
+            display: flex;
+            justify-content: center;
+            position: fixed;
+            bottom: 100px;
+            width: 100%;
+        }
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background-color: #ddd;
+            margin: 0 4px;
+            transition: all 0.3s;
+        }
+        .indicator-dot.active {
+            width: 20px;
+            background-color: #FF4B4B;
+        }
+    </style>
+</head>
+<body>
+    <div class="guide-container">
+        <div class="button-skip" onclick="skipToLogin()">跳过</div>
+        
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <!-- 引导页1 -->
+                <div class="swiper-slide" style="background-color: #FFF5F5;">
+                    <div class="slide-image" style="background-image: url('https://img.freepik.com/free-vector/organic-flat-people-meditating-illustration_23-2148906556.jpg?w=826&t=st=1687788554~exp=1687789154~hmac=0dbc764e062dfdd586e0b9b6b8d4b9bfdb4f90c7a92c3b3f9f2f4cc5fea81cb6');"></div>
+                    <div class="slide-content">
+                        <h2 class="slide-title">健康饮食</h2>
+                        <p class="slide-desc">探索健康食谱，获取专业营养建议，让每一餐都充满健康活力</p>
+                    </div>
+                </div>
+                
+                <!-- 引导页2 -->
+                <div class="swiper-slide" style="background-color: #F0FFF4;">
+                    <div class="slide-image" style="background-image: url('https://img.freepik.com/free-vector/salad-bowl-concept-illustration_114360-13421.jpg?w=826&t=st=1687788677~exp=1687789277~hmac=4a2e3e96e7b40e431efc0ec350b63e5cfa186df4d339368c39fb76e60e2f5bae');"></div>
+                    <div class="slide-content">
+                        <h2 class="slide-title">食材分析</h2>
+                        <p class="slide-desc">智能识别食材成分，了解营养价值，轻松掌握健康饮食的奥秘</p>
+                    </div>
+                </div>
+                
+                <!-- 引导页3 -->
+                <div class="swiper-slide" style="background-color: #F0F4FF;">
+                    <div class="slide-image" style="background-image: url('https://img.freepik.com/free-vector/people-using-online-apps-set_52683-34832.jpg?w=826&t=st=1687788792~exp=1687789392~hmac=f1371bd3e2e8b8c39872d5653f9a9901e6de3e4aa3e9c99bc7dfa8608b175880');"></div>
+                    <div class="slide-content">
+                        <h2 class="slide-title">社区互动</h2>
+                        <p class="slide-desc">加入健康生活社区，分享心得体会，与志同道合的朋友一起追求健康</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="swiper-indicator">
+            <div class="indicator-dot active"></div>
+            <div class="indicator-dot"></div>
+            <div class="indicator-dot"></div>
+        </div>
+        
+        <div class="guide-footer">
+            <div class="button-next" onclick="nextSlide()">下一步</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 3;
+        
+        function updateIndicator() {
+            const dots = document.querySelectorAll('.indicator-dot');
+            dots.forEach((dot, index) => {
+                if (index === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+        
+        function updateSlides() {
+            const slides = document.querySelectorAll('.swiper-slide');
+            slides.forEach((slide, index) => {
+                slide.style.display = index === currentSlide ? 'flex' : 'none';
+            });
+            
+            const nextButton = document.querySelector('.button-next');
+            if (currentSlide === totalSlides - 1) {
+                nextButton.textContent = '开始使用';
+            } else {
+                nextButton.textContent = '下一步';
+            }
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateIndicator();
+                updateSlides();
+            } else {
+                // 最后一页，跳转到登录页
+                window.location.href = '登录页.html';
+            }
+        }
+        
+        function skipToLogin() {
+            window.location.href = '登录页.html';
+        }
+        
+        // 初始化
+        updateIndicator();
+        updateSlides();
+    </script>
+</body>
+</html> 

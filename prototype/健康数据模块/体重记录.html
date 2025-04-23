@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 体重记录</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 60px;
+        }
+        .header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #44b3ff, #4e87fc);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            color: white;
+        }
+        .header-back {
+            margin-right: 12px;
+            font-size: 20px;
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            flex: 1;
+            text-align: center;
+        }
+        .header-more {
+            font-size: 20px;
+        }
+        .weight-summary {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .summary-date {
+            font-size: 14px;
+            color: #969799;
+            margin-bottom: 24px;
+        }
+        .current-weight {
+            font-size: 48px;
+            font-weight: bold;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .weight-unit {
+            font-size: 16px;
+            color: #969799;
+            margin-left: 4px;
+        }
+        .weight-changes {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .change-value {
+            font-size: 14px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 0 8px;
+        }
+        .change-down {
+            color: #07c160;
+            background: rgba(7, 193, 96, 0.1);
+        }
+        .change-up {
+            color: #ee0a24;
+            background: rgba(238, 10, 36, 0.1);
+        }
+        .time-range {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .range-button {
+            padding: 6px 12px;
+            margin: 0 4px;
+            font-size: 14px;
+            border-radius: 16px;
+            background: #f2f3f5;
+            color: #646566;
+        }
+        .range-button.active {
+            background: #4e87fc;
+            color: white;
+        }
+        .chart-container {
+            height: 200px;
+            position: relative;
+            margin: 0 -16px;
+            padding: 0 16px;
+            overflow: hidden;
+        }
+        .chart-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0 16px;
+        }
+        .chart-dot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #4e87fc;
+            transform: translate(-50%, -50%);
+        }
+        .chart-path {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            stroke: #4e87fc;
+            stroke-width: 2;
+            fill: none;
+        }
+        .chart-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            fill: url(#gradient);
+            opacity: 0.2;
+        }
+        .chart-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+        .grid-line {
+            flex: 1;
+            border-top: 1px dashed #f2f3f5;
+            position: relative;
+        }
+        .grid-line:first-child {
+            border-top: none;
+        }
+        .grid-label {
+            position: absolute;
+            left: 0;
+            top: -8px;
+            font-size: 10px;
+            color: #c8c9cc;
+        }
+        .stats-container {
+            display: flex;
+            margin-top: 16px;
+        }
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 0 8px;
+            border-right: 1px solid #f2f3f5;
+        }
+        .stat-item:last-child {
+            border-right: none;
+        }
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #969799;
+        }
+        .bmi-card {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .bmi-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .bmi-meter {
+            height: 16px;
+            background: linear-gradient(to right, #07c160, #3498db, #f39c12, #e74c3c);
+            border-radius: 8px;
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .bmi-indicator {
+            position: absolute;
+            top: -5px;
+            width: 10px;
+            height: 26px;
+            background: white;
+            border: 2px solid #4e87fc;
+            border-radius: 3px;
+            transform: translateX(-50%);
+        }
+        .bmi-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: -16px;
+            margin-bottom: 16px;
+        }
+        .bmi-label {
+            font-size: 12px;
+            color: #969799;
+            text-align: center;
+            width: 24%;
+        }
+        .bmi-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4e87fc;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .bmi-category {
+            text-align: center;
+            font-size: 14px;
+            color: #4e87fc;
+            margin-bottom: 16px;
+        }
+        .bmi-explanation {
+            font-size: 14px;
+            color: #646566;
+            line-height: 1.5;
+            background: #f7f8fa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .record-list {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .record-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .record-title {
+            font-size: 16px;
+            font-weight: bold;
+            flex: 1;
+        }
+        .record-more {
+            font-size: 14px;
+            color: #4e87fc;
+        }
+        .record-item {
+            display: flex;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .record-item:last-child {
+            border-bottom: none;
+        }
+        .record-date {
+            flex: 1;
+        }
+        .record-day {
+            font-size: 16px;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .record-time {
+            font-size: 12px;
+            color: #969799;
+        }
+        .record-weight {
+            font-size: 16px;
+            font-weight: bold;
+            color: #323233;
+        }
+        .add-button {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #44b3ff, #4e87fc);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(78, 135, 252, 0.4);
+        }
+        .weight-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .dialog-content {
+            width: 90%;
+            max-width: 320px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .dialog-header {
+            padding: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .dialog-body {
+            padding: 20px 16px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            font-size: 14px;
+            color: #646566;
+            margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ebedf0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-note {
+            font-size: 12px;
+            color: #969799;
+            margin-top: 4px;
+        }
+        .number-input {
+            display: flex;
+            align-items: center;
+        }
+        .number-field {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #ebedf0;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .number-unit {
+            margin-left: 8px;
+            font-size: 14px;
+            color: #646566;
+        }
+        .dialog-footer {
+            display: flex;
+            border-top: 1px solid #f2f3f5;
+        }
+        .dialog-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .dialog-cancel {
+            color: #646566;
+            border-right: 1px solid #f2f3f5;
+        }
+        .dialog-confirm {
+            color: #4e87fc;
+            font-weight: bold;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            background: white;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            color: #969799;
+            font-size: 12px;
+        }
+        .nav-item.active {
+            color: #4e87fc;
+        }
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <i class="van-icon van-icon-arrow-left header-back"></i>
+            <div class="header-title">体重记录</div>
+            <i class="van-icon van-icon-ellipsis header-more"></i>
+        </div>
+        
+        <div class="weight-summary">
+            <div class="summary-date">2023年7月8日</div>
+            
+            <div class="current-weight">
+                64.5<span class="weight-unit">kg</span>
+            </div>
+            
+            <div class="weight-changes">
+                <span class="change-value change-down">
+                    <i class="van-icon van-icon-arrow-down"></i>
+                    0.5kg
+                </span>
+                <span>较上次</span>
+                <span class="change-value change-down">
+                    <i class="van-icon van-icon-arrow-down"></i>
+                    2.3kg
+                </span>
+                <span>较本月初</span>
+            </div>
+            
+            <div class="time-range">
+                <div class="range-button">周</div>
+                <div class="range-button active">月</div>
+                <div class="range-button">3月</div>
+                <div class="range-button">年</div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-grid">
+                    <div class="grid-line">
+                        <span class="grid-label">67kg</span>
+                    </div>
+                    <div class="grid-line">
+                        <span class="grid-label">66kg</span>
+                    </div>
+                    <div class="grid-line">
+                        <span class="grid-label">65kg</span>
+                    </div>
+                    <div class="grid-line">
+                        <span class="grid-label">64kg</span>
+                    </div>
+                </div>
+                
+                <svg class="chart-line" viewBox="0 0 300 200" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#4e87fc" />
+                            <stop offset="100%" stop-color="#44b3ff" stop-opacity="0.2" />
+                        </linearGradient>
+                    </defs>
+                    <path class="chart-path" d="M0,120 C20,130 40,150 60,140 C80,130 100,90 120,80 C140,70 160,60 180,50 C200,40 220,30 240,40 C260,50 280,50 300,40" />
+                    <path class="chart-area" d="M0,120 C20,130 40,150 60,140 C80,130 100,90 120,80 C140,70 160,60 180,50 C200,40 220,30 240,40 C260,50 280,50 300,40 L300,200 L0,200 Z" />
+                    <circle class="chart-dot" cx="0" cy="120" r="4"></circle>
+                    <circle class="chart-dot" cx="60" cy="140" r="4"></circle>
+                    <circle class="chart-dot" cx="120" cy="80" r="4"></circle>
+                    <circle class="chart-dot" cx="180" cy="50" r="4"></circle>
+                    <circle class="chart-dot" cx="240" cy="40" r="4"></circle>
+                    <circle class="chart-dot" cx="300" cy="40" r="4"></circle>
+                </svg>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-value">66.8kg</div>
+                    <div class="stat-label">起始体重</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">64.5kg</div>
+                    <div class="stat-label">当前体重</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">-2.3kg</div>
+                    <div class="stat-label">变化</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bmi-card">
+            <div class="bmi-title">BMI 指数</div>
+            
+            <div class="bmi-meter">
+                <div class="bmi-indicator" style="left: 42%;"></div>
+            </div>
+            
+            <div class="bmi-labels">
+                <div class="bmi-label">偏瘦</div>
+                <div class="bmi-label">正常</div>
+                <div class="bmi-label">偏胖</div>
+                <div class="bmi-label">肥胖</div>
+            </div>
+            
+            <div class="bmi-value">22.6</div>
+            <div class="bmi-category">健康体重范围</div>
+            
+            <div class="bmi-explanation">
+                体重指数(BMI)是用体重公斤数除以身高米数平方得出的数字，是目前国际上常用的衡量人体胖瘦程度的标准。您的BMI值为22.6，处于健康体重范围(18.5-24.9)，保持健康的生活方式可以维持这个范围。
+            </div>
+        </div>
+        
+        <div class="record-list">
+            <div class="record-header">
+                <div class="record-title">历史记录</div>
+                <div class="record-more">查看全部 <i class="van-icon van-icon-arrow"></i></div>
+            </div>
+            
+            <div class="record-item">
+                <div class="record-date">
+                    <div class="record-day">今天</div>
+                    <div class="record-time">08:35</div>
+                </div>
+                <div class="record-weight">64.5kg</div>
+            </div>
+            
+            <div class="record-item">
+                <div class="record-date">
+                    <div class="record-day">昨天</div>
+                    <div class="record-time">08:42</div>
+                </div>
+                <div class="record-weight">65.0kg</div>
+            </div>
+            
+            <div class="record-item">
+                <div class="record-date">
+                    <div class="record-day">7月6日</div>
+                    <div class="record-time">08:30</div>
+                </div>
+                <div class="record-weight">65.2kg</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="add-button" id="addWeightBtn">
+        <i class="van-icon van-icon-plus"></i>
+    </div>
+    
+    <div class="weight-dialog" id="weightDialog">
+        <div class="dialog-content">
+            <div class="dialog-header">记录体重</div>
+            <div class="dialog-body">
+                <div class="form-group">
+                    <div class="form-label">日期</div>
+                    <input type="date" class="form-input" value="2023-07-08">
+                </div>
+                <div class="form-group">
+                    <div class="form-label">时间</div>
+                    <input type="time" class="form-input" value="08:00">
+                </div>
+                <div class="form-group">
+                    <div class="form-label">体重</div>
+                    <div class="number-input">
+                        <input type="number" class="number-field" value="64.5" step="0.1">
+                        <div class="number-unit">kg</div>
+                    </div>
+                    <div class="form-note">请输入精确到小数点后一位的体重数值</div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label">备注（可选）</div>
+                    <input type="text" class="form-input" placeholder="添加备注信息">
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <div class="dialog-btn dialog-cancel" id="cancelBtn">取消</div>
+                <div class="dialog-btn dialog-confirm" id="confirmBtn">确认</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bottom-nav">
+        <div class="nav-item">
+            <i class="van-icon van-icon-home-o nav-icon"></i>
+            <div>首页</div>
+        </div>
+        <div class="nav-item active">
+            <i class="van-icon van-icon-chart-trending-o nav-icon"></i>
+            <div>健康</div>
+        </div>
+        <div class="nav-item">
+            <i class="van-icon van-icon-shop-o nav-icon"></i>
+            <div>食谱</div>
+        </div>
+        <div class="nav-item">
+            <i class="van-icon van-icon-manager-o nav-icon"></i>
+            <div>我的</div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addBtn = document.getElementById('addWeightBtn');
+            const dialog = document.getElementById('weightDialog');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            addBtn.addEventListener('click', function() {
+                dialog.style.display = 'flex';
+            });
+            
+            cancelBtn.addEventListener('click', function() {
+                dialog.style.display = 'none';
+            });
+            
+            confirmBtn.addEventListener('click', function() {
+                // 处理体重记录提交
+                dialog.style.display = 'none';
+                // 这里可以添加提交成功的提示
+                alert('体重记录已添加');
+            });
+            
+            // 时间范围选择
+            const rangeButtons = document.querySelectorAll('.range-button');
+            rangeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    rangeButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

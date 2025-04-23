@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 睡眠记录</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 60px;
+        }
+        .header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #44b3ff, #4e87fc);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            color: white;
+        }
+        .header-back {
+            margin-right: 12px;
+            font-size: 20px;
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            flex: 1;
+            text-align: center;
+        }
+        .header-more {
+            font-size: 20px;
+        }
+        .sleep-summary {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .summary-date {
+            font-size: 14px;
+            color: #969799;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .date-buttons {
+            display: flex;
+            align-items: center;
+        }
+        .date-arrow {
+            font-size: 16px;
+            color: #323233;
+            margin: 0 4px;
+        }
+        .summary-time {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .time-large {
+            font-size: 36px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .time-unit {
+            font-size: 16px;
+            color: #646566;
+        }
+        .time-detail {
+            display: flex;
+            margin-left: auto;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .time-range {
+            font-size: 14px;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .time-status {
+            font-size: 12px;
+            color: #4e87fc;
+            background: #e1f3ff;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .quality-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: conic-gradient(#4e87fc 0% 85%, #f5f5f5 85% 100%);
+            position: relative;
+            margin: 0 auto 16px;
+        }
+        .quality-inner {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .quality-score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4e87fc;
+        }
+        .quality-text {
+            font-size: 12px;
+            color: #969799;
+        }
+        .sleep-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 0 8px;
+            border-right: 1px solid #f2f3f5;
+        }
+        .stat-item:last-child {
+            border-right: none;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #969799;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .chart-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chart-subtitle {
+            font-size: 12px;
+            color: #969799;
+            font-weight: normal;
+        }
+        .chart-container {
+            height: 200px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+        .chart-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-row {
+            flex: 1;
+            border-top: 1px dashed #f2f3f5;
+            position: relative;
+        }
+        .chart-row:first-child {
+            border-top: none;
+        }
+        .row-label {
+            position: absolute;
+            left: -4px;
+            top: -8px;
+            font-size: 10px;
+            color: #c8c9cc;
+        }
+        .sleep-periods {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+        }
+        .day-column {
+            flex: 1;
+            height: 100%;
+            padding: 0 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .sleep-bar {
+            width: 100%;
+            background: linear-gradient(to top, #4e87fc, #44b3ff);
+            border-radius: 4px 4px 0 0;
+        }
+        .day-label {
+            text-align: center;
+            font-size: 10px;
+            color: #969799;
+            margin-top: 8px;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 16px;
+            font-size: 12px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 8px;
+            color: #646566;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 4px;
+        }
+        .pattern-card {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .pattern-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .pattern-time {
+            display: flex;
+            align-items: center;
+            background: #f7f8fa;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+        }
+        .time-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #44b3ff, #4e87fc);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+            font-size: 18px;
+        }
+        .time-data {
+            flex: 1;
+        }
+        .time-label {
+            font-size: 14px;
+            color: #646566;
+            margin-bottom: 4px;
+        }
+        .time-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #323233;
+        }
+        .advice-card {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .advice-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .advice-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .advice-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .advice-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #e1f3ff;
+            color: #4e87fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+        .advice-content {
+            flex: 1;
+        }
+        .advice-text {
+            font-size: 14px;
+            color: #323233;
+            line-height: 1.5;
+        }
+        .add-button {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #44b3ff, #4e87fc);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(78, 135, 252, 0.4);
+        }
+        .sleep-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .dialog-content {
+            width: 90%;
+            max-width: 320px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .dialog-header {
+            padding: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .dialog-body {
+            padding: 20px 16px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            font-size: 14px;
+            color: #646566;
+            margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ebedf0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-note {
+            font-size: 12px;
+            color: #969799;
+            margin-top: 4px;
+        }
+        .dialog-footer {
+            display: flex;
+            border-top: 1px solid #f2f3f5;
+        }
+        .dialog-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .dialog-cancel {
+            color: #646566;
+            border-right: 1px solid #f2f3f5;
+        }
+        .dialog-confirm {
+            color: #4e87fc;
+            font-weight: bold;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            background: white;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            color: #969799;
+            font-size: 12px;
+        }
+        .nav-item.active {
+            color: #4e87fc;
+        }
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <i class="van-icon van-icon-arrow-left header-back"></i>
+            <div class="header-title">睡眠记录</div>
+            <i class="van-icon van-icon-ellipsis header-more"></i>
+        </div>
+        
+        <div class="sleep-summary">
+            <div class="summary-date">
+                <span>2023年7月8日</span>
+                <div class="date-buttons">
+                    <i class="van-icon van-icon-arrow-left date-arrow"></i>
+                    <i class="van-icon van-icon-arrow date-arrow"></i>
+                </div>
+            </div>
+            
+            <div class="summary-time">
+                <span class="time-large">7</span>
+                <span class="time-unit">小时<br>25分钟</span>
+                <div class="time-detail">
+                    <div class="time-range">23:10 - 06:35</div>
+                    <div class="time-status">良好睡眠</div>
+                </div>
+            </div>
+            
+            <div class="quality-circle">
+                <div class="quality-inner">
+                    <div class="quality-score">85</div>
+                    <div class="quality-text">睡眠评分</div>
+                </div>
+            </div>
+            
+            <div class="sleep-stats">
+                <div class="stat-item">
+                    <div class="stat-value">92%</div>
+                    <div class="stat-label">深睡比例</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">2次</div>
+                    <div class="stat-label">醒来次数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">15分钟</div>
+                    <div class="stat-label">入睡时间</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>睡眠时长趋势</span>
+                <span class="chart-subtitle">过去7天</span>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-background">
+                    <div class="chart-row">
+                        <span class="row-label">9h</span>
+                    </div>
+                    <div class="chart-row">
+                        <span class="row-label">8h</span>
+                    </div>
+                    <div class="chart-row">
+                        <span class="row-label">7h</span>
+                    </div>
+                    <div class="chart-row">
+                        <span class="row-label">6h</span>
+                    </div>
+                </div>
+                
+                <div class="sleep-periods">
+                    <div class="day-column">
+                        <div class="sleep-bar" style="height: 50%;"></div>
+                        <div class="day-label">7/2</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="sleep-bar" style="height: 80%;"></div>
+                        <div class="day-label">7/3</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="sleep-bar" style="height: 65%;"></div>
+                        <div class="day-label">7/4</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="sleep-bar" style="height: 60%;"></div>
+                        <div class="day-label">7/5</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="sleep-bar" style="height: 70%;"></div>
+                        <div class="day-label">7/6</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="sleep-bar" style="height: 75%;"></div>
+                        <div class="day-label">7/7</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="sleep-bar" style="height: 85%;"></div>
+                        <div class="day-label">今天</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(to top, #4e87fc, #44b3ff);"></div>
+                    <span>睡眠时长</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f2f3f5;"></div>
+                    <span>目标 8 小时</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pattern-card">
+            <div class="pattern-title">睡眠模式</div>
+            
+            <div class="pattern-time">
+                <div class="time-icon">
+                    <i class="van-icon van-icon-clock-o"></i>
+                </div>
+                <div class="time-data">
+                    <div class="time-label">平均入睡时间</div>
+                    <div class="time-value">23:15</div>
+                </div>
+            </div>
+            
+            <div class="pattern-time">
+                <div class="time-icon">
+                    <i class="van-icon van-icon-clock-o"></i>
+                </div>
+                <div class="time-data">
+                    <div class="time-label">平均起床时间</div>
+                    <div class="time-value">06:40</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="advice-card">
+            <div class="advice-title">改善建议</div>
+            
+            <div class="advice-item">
+                <div class="advice-icon">
+                    <i class="van-icon van-icon-bulb-o"></i>
+                </div>
+                <div class="advice-content">
+                    <div class="advice-text">建议保持规律作息，每天相近时间入睡和起床，有助于提高睡眠质量。</div>
+                </div>
+            </div>
+            
+            <div class="advice-item">
+                <div class="advice-icon">
+                    <i class="van-icon van-icon-bulb-o"></i>
+                </div>
+                <div class="advice-content">
+                    <div class="advice-text">睡前30分钟避免使用电子设备，蓝光会抑制褪黑素分泌。</div>
+                </div>
+            </div>
+            
+            <div class="advice-item">
+                <div class="advice-icon">
+                    <i class="van-icon van-icon-bulb-o"></i>
+                </div>
+                <div class="advice-content">
+                    <div class="advice-text">睡前可以进行轻度放松活动，如阅读或听轻音乐，帮助身心放松。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="add-button" id="addSleepBtn">
+        <i class="van-icon van-icon-plus"></i>
+    </div>
+    
+    <div class="sleep-dialog" id="sleepDialog">
+        <div class="dialog-content">
+            <div class="dialog-header">记录睡眠</div>
+            <div class="dialog-body">
+                <div class="form-group">
+                    <div class="form-label">入睡时间</div>
+                    <input type="time" class="form-input" value="23:00">
+                </div>
+                <div class="form-group">
+                    <div class="form-label">起床时间</div>
+                    <input type="time" class="form-input" value="07:00">
+                </div>
+                <div class="form-group">
+                    <div class="form-label">睡眠质量评价</div>
+                    <select class="form-input">
+                        <option>很好</option>
+                        <option>良好</option>
+                        <option>一般</option>
+                        <option>较差</option>
+                        <option>很差</option>
+                    </select>
+                    <div class="form-note">对自己的睡眠质量进行评价，帮助系统分析</div>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <div class="dialog-btn dialog-cancel" id="cancelBtn">取消</div>
+                <div class="dialog-btn dialog-confirm" id="confirmBtn">确认</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bottom-nav">
+        <div class="nav-item">
+            <i class="van-icon van-icon-home-o nav-icon"></i>
+            <div>首页</div>
+        </div>
+        <div class="nav-item active">
+            <i class="van-icon van-icon-chart-trending-o nav-icon"></i>
+            <div>健康</div>
+        </div>
+        <div class="nav-item">
+            <i class="van-icon van-icon-shop-o nav-icon"></i>
+            <div>食谱</div>
+        </div>
+        <div class="nav-item">
+            <i class="van-icon van-icon-manager-o nav-icon"></i>
+            <div>我的</div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addBtn = document.getElementById('addSleepBtn');
+            const dialog = document.getElementById('sleepDialog');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            addBtn.addEventListener('click', function() {
+                dialog.style.display = 'flex';
+            });
+            
+            cancelBtn.addEventListener('click', function() {
+                dialog.style.display = 'none';
+            });
+            
+            confirmBtn.addEventListener('click', function() {
+                // 处理睡眠记录提交
+                dialog.style.display = 'none';
+                // 这里可以添加提交成功的提示
+                alert('睡眠记录已添加');
+            });
+        });
+    </script>
+</body>
+</html> 

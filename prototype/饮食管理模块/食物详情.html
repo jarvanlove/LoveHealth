@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 食物详情</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 60px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            height: 48px;
+            padding: 0 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+        .header-back {
+            font-size: 20px;
+            color: #323233;
+            margin-right: 16px;
+        }
+        .header-title {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            text-align: center;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        .header-button {
+            font-size: 20px;
+            color: #323233;
+            padding: 4px;
+            margin-left: 8px;
+        }
+        .content {
+            padding-top: 48px;
+        }
+        .food-hero {
+            background: linear-gradient(to bottom, #1989fa, #39a9ed);
+            color: white;
+            padding: 20px 16px;
+            position: relative;
+        }
+        .food-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .food-category {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 16px;
+        }
+        .food-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .food-tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .nutrition-overview {
+            background-color: white;
+            border-radius: 8px;
+            margin: -20px 16px 0;
+            padding: 20px 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 10;
+        }
+        .nutrition-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .nutrition-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .standard-text {
+            font-size: 12px;
+            color: #969799;
+        }
+        .portion-selector {
+            background: #f2f3f5;
+            padding: 4px 10px;
+            border-radius: 16px;
+            color: #323233;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .portion-text {
+            margin-right: 4px;
+        }
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .nutrition-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 4px;
+        }
+        .nutrition-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .main-nutrition-value {
+            color: #1989fa;
+        }
+        .nutrition-label {
+            font-size: 12px;
+            color: #969799;
+        }
+        .detail-card {
+            background-color: white;
+            border-radius: 8px;
+            margin: 12px 16px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            margin-bottom: 16px;
+        }
+        .macro-chart {
+            height: 120px;
+            display: flex;
+            padding: 0 12px;
+            position: relative;
+        }
+        .chart-label {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .total-calories {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1989fa;
+        }
+        .calories-label {
+            font-size: 12px;
+            color: #969799;
+        }
+        .macro-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .macro-bar {
+            width: 30px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 8px;
+        }
+        .protein-bar {
+            background-color: #1989fa;
+            height: 70%;
+        }
+        .carbs-bar {
+            background-color: #ff9f66;
+            height: 40%;
+        }
+        .fat-bar {
+            background-color: #ee0a24;
+            height: 20%;
+        }
+        .macro-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #323233;
+        }
+        .macro-percent {
+            font-size: 12px;
+            color: #969799;
+        }
+        .macro-name {
+            font-size: 12px;
+            color: #323233;
+            margin-top: 4px;
+        }
+        .nutrition-table {
+            width: 100%;
+        }
+        .nutrition-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .nutrition-row:last-child {
+            border-bottom: none;
+        }
+        .nutrition-key {
+            flex: 1;
+            font-size: 14px;
+            color: #323233;
+        }
+        .nutrition-val {
+            font-size: 14px;
+            font-weight: 500;
+            color: #323233;
+        }
+        .vitamin-minerals {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .vitamin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .vitamin-name {
+            font-size: 14px;
+            color: #323233;
+        }
+        .vitamin-value {
+            font-size: 14px;
+            color: #323233;
+            font-weight: 500;
+        }
+        .recommendations {
+            margin-top: 8px;
+        }
+        .recommendation-title {
+            font-size: 14px;
+            color: #323233;
+            margin-bottom: 12px;
+        }
+        .recommendation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .recommendation-item {
+            padding: 12px;
+            background: #f7f8fa;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #323233;
+        }
+        .add-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: #1989fa;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(25, 137, 250, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <i class="van-icon van-icon-arrow-left header-back" onclick="window.history.back()"></i>
+            <div class="header-title">食物详情</div>
+            <div class="header-actions">
+                <div class="header-button">
+                    <i class="van-icon van-icon-share-o"></i>
+                </div>
+                <div class="header-button">
+                    <i class="van-icon van-icon-star-o"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="food-hero">
+                <div class="food-name">鸡胸肉</div>
+                <div class="food-category">肉类 · 家禽</div>
+                <div class="food-tags">
+                    <div class="food-tag">高蛋白质</div>
+                    <div class="food-tag">低脂肪</div>
+                    <div class="food-tag">健身食品</div>
+                </div>
+            </div>
+            
+            <div class="nutrition-overview">
+                <div class="nutrition-header">
+                    <div class="nutrition-title">营养概览</div>
+                    <div class="portion-selector">
+                        <span class="portion-text">100克</span>
+                        <i class="van-icon van-icon-arrow"></i>
+                    </div>
+                </div>
+                <div class="standard-text">每100克生鸡胸肉</div>
+                <div class="nutrition-grid">
+                    <div class="nutrition-item">
+                        <div class="nutrition-value main-nutrition-value">165</div>
+                        <div class="nutrition-label">热量(千卡)</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">31g</div>
+                        <div class="nutrition-label">蛋白质</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">0g</div>
+                        <div class="nutrition-label">碳水化合物</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">3.6g</div>
+                        <div class="nutrition-label">脂肪</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-card">
+                <div class="card-title">热量来源</div>
+                <div class="macro-chart">
+                    <div class="chart-label">
+                        <div class="total-calories">165</div>
+                        <div class="calories-label">千卡/100g</div>
+                    </div>
+                    <div class="macro-column">
+                        <div class="macro-bar protein-bar"></div>
+                        <div class="macro-value">124</div>
+                        <div class="macro-percent">75%</div>
+                        <div class="macro-name">蛋白质</div>
+                    </div>
+                    <div class="macro-column">
+                        <div class="macro-bar carbs-bar"></div>
+                        <div class="macro-value">0</div>
+                        <div class="macro-percent">0%</div>
+                        <div class="macro-name">碳水</div>
+                    </div>
+                    <div class="macro-column">
+                        <div class="macro-bar fat-bar"></div>
+                        <div class="macro-value">41</div>
+                        <div class="macro-percent">25%</div>
+                        <div class="macro-name">脂肪</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-card">
+                <div class="card-title">详细营养成分</div>
+                <div class="nutrition-table">
+                    <div class="nutrition-row">
+                        <div class="nutrition-key">蛋白质</div>
+                        <div class="nutrition-val">31g</div>
+                    </div>
+                    <div class="nutrition-row">
+                        <div class="nutrition-key">脂肪(总)</div>
+                        <div class="nutrition-val">3.6g</div>
+                    </div>
+                    <div class="nutrition-row">
+                        <div class="nutrition-key">- 饱和脂肪</div>
+                        <div class="nutrition-val">1g</div>
+                    </div>
+                    <div class="nutrition-row">
+                        <div class="nutrition-key">- 不饱和脂肪</div>
+                        <div class="nutrition-val">2.6g</div>
+                    </div>
+                    <div class="nutrition-row">
+                        <div class="nutrition-key">- 反式脂肪</div>
+                        <div class="nutrition-val">0g</div>
+                    </div>
+                    <div class="nutrition-row">
+                        <div class="nutrition-key">碳水化合物</div>
+                        <div class="nutrition-val">0g</div>
+                    </div>
+                    <div class="nutrition-row">
+                        <div class="nutrition-key">- 糖</div>
+                        <div class="nutrition-val">0g</div>
+                    </div>
+                    <div class="nutrition-row">
+                        <div class="nutrition-key">- 膳食纤维</div>
+                        <div class="nutrition-val">0g</div>
+                    </div>
+                    <div class="nutrition-row">
+                        <div class="nutrition-key">胆固醇</div>
+                        <div class="nutrition-val">85mg</div>
+                    </div>
+                    <div class="nutrition-row">
+                        <div class="nutrition-key">钠</div>
+                        <div class="nutrition-val">74mg</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-card">
+                <div class="card-title">维生素与矿物质</div>
+                <div class="vitamin-minerals">
+                    <div class="vitamin-item">
+                        <div class="vitamin-name">维生素B6</div>
+                        <div class="vitamin-value">0.6mg</div>
+                    </div>
+                    <div class="vitamin-item">
+                        <div class="vitamin-name">维生素B12</div>
+                        <div class="vitamin-value">0.3μg</div>
+                    </div>
+                    <div class="vitamin-item">
+                        <div class="vitamin-name">烟酸</div>
+                        <div class="vitamin-value">13.7mg</div>
+                    </div>
+                    <div class="vitamin-item">
+                        <div class="vitamin-name">钾</div>
+                        <div class="vitamin-value">256mg</div>
+                    </div>
+                    <div class="vitamin-item">
+                        <div class="vitamin-name">磷</div>
+                        <div class="vitamin-value">196mg</div>
+                    </div>
+                    <div class="vitamin-item">
+                        <div class="vitamin-name">镁</div>
+                        <div class="vitamin-value">27mg</div>
+                    </div>
+                    <div class="vitamin-item">
+                        <div class="vitamin-name">铁</div>
+                        <div class="vitamin-value">0.9mg</div>
+                    </div>
+                    <div class="vitamin-item">
+                        <div class="vitamin-name">锌</div>
+                        <div class="vitamin-value">1mg</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-card">
+                <div class="card-title">健康建议</div>
+                <div class="recommendations">
+                    <div class="recommendation-title">鸡胸肉的健康益处</div>
+                    <div class="recommendation-list">
+                        <div class="recommendation-item">鸡胸肉是优质蛋白质的绝佳来源，有助于肌肉生长和修复</div>
+                        <div class="recommendation-item">低脂肪含量使其成为减肥期间的理想选择</div>
+                        <div class="recommendation-item">含有丰富的维生素B群，有助于能量代谢</div>
+                    </div>
+                </div>
+                
+                <div class="recommendations">
+                    <div class="recommendation-title">烹饪建议</div>
+                    <div class="recommendation-list">
+                        <div class="recommendation-item">烤制或蒸煮比油炸更健康，可保留更多营养素</div>
+                        <div class="recommendation-item">使用香草和香料调味，减少盐和糖的添加</div>
+                        <div class="recommendation-item">烹饪前腌制可增加鲜嫩度和风味</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="add-button" id="addFoodButton">
+            <i class="van-icon van-icon-plus"></i>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加食物按钮
+            const addButton = document.getElementById('addFoodButton');
+            addButton.addEventListener('click', function() {
+                // 显示一个添加食物的弹窗（这里用alert简单模拟）
+                const options = [
+                    '添加到早餐',
+                    '添加到午餐',
+                    '添加到晚餐',
+                    '添加到加餐'
+                ];
+                
+                const optionsStr = options.map((option, index) => 
+                    `${index + 1}. ${option}`
+                ).join('\n');
+                
+                const selection = prompt(`选择添加到哪一餐：\n${optionsStr}`);
+                
+                if (selection) {
+                    alert(`已添加鸡胸肉(100g)到今日饮食记录`);
+                }
+            });
+            
+            // 份量选择器
+            const portionSelector = document.querySelector('.portion-selector');
+            portionSelector.addEventListener('click', function() {
+                const options = [
+                    '50克',
+                    '100克',
+                    '150克',
+                    '200克',
+                    '自定义'
+                ];
+                
+                const optionsStr = options.map((option, index) => 
+                    `${index + 1}. ${option}`
+                ).join('\n');
+                
+                const selection = prompt(`选择份量：\n${optionsStr}`);
+                
+                if (selection && options[selection - 1]) {
+                    document.querySelector('.portion-text').textContent = options[selection - 1];
+                }
+            });
+            
+            // 收藏按钮
+            const starButton = document.querySelector('.van-icon-star-o');
+            starButton.addEventListener('click', function() {
+                this.classList.toggle('van-icon-star-o');
+                this.classList.toggle('van-icon-star');
+                if (this.classList.contains('van-icon-star')) {
+                    this.style.color = '#ff9f66';
+                    alert('已添加到收藏');
+                } else {
+                    this.style.color = '';
+                    alert('已取消收藏');
+                }
+            });
+            
+            // 分享按钮
+            const shareButton = document.querySelector('.van-icon-share-o');
+            shareButton.addEventListener('click', function() {
+                alert('分享功能暂未实现');
+            });
+        });
+    </script>
+</body>
+</html> 

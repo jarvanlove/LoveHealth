@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 饮食记录</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 60px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, #1989fa, #39a9ed);
+            color: white;
+            display: flex;
+            align-items: center;
+            height: 56px;
+            padding: 0 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header-back {
+            font-size: 20px;
+            color: white;
+            margin-right: 16px;
+        }
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+        }
+        .header-action {
+            font-size: 20px;
+            padding: 4px;
+        }
+        .content {
+            padding-top: 56px;
+        }
+        .date-selector {
+            background: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+        .date-arrow {
+            font-size: 16px;
+            padding: 4px 8px;
+            color: #1989fa;
+        }
+        .date-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            margin: 0 16px;
+        }
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .summary-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .summary-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+        }
+        .summary-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1989fa;
+        }
+        .progress-container {
+            margin-bottom: 16px;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #f2f3f5;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(to right, #1989fa, #39a9ed);
+            border-radius: 4px;
+        }
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #969799;
+            margin-top: 4px;
+        }
+        .nutrient-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .nutrient-item {
+            text-align: center;
+        }
+        .nutrient-value {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .protein-value {
+            color: #1989fa;
+        }
+        .carbs-value {
+            color: #ff9f66;
+        }
+        .fat-value {
+            color: #ee0a24;
+        }
+        .nutrient-label {
+            font-size: 12px;
+            color: #969799;
+        }
+        .nutrient-percent {
+            font-size: 12px;
+            color: #323233;
+            margin-top: 2px;
+        }
+        .meal-section {
+            margin: 16px;
+        }
+        .meal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .meal-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            display: flex;
+            align-items: center;
+        }
+        .meal-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 12px;
+            background: rgba(25, 137, 250, 0.1);
+            color: #1989fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+        .lunch-icon {
+            background: rgba(255, 159, 102, 0.1);
+            color: #ff9f66;
+        }
+        .dinner-icon {
+            background: rgba(238, 10, 36, 0.1);
+            color: #ee0a24;
+        }
+        .snack-icon {
+            background: rgba(156, 39, 176, 0.1);
+            color: #9c27b0;
+        }
+        .meal-calories {
+            font-size: 14px;
+            color: #969799;
+        }
+        .meal-add {
+            padding: 2px 8px;
+            background: rgba(25, 137, 250, 0.1);
+            color: #1989fa;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .food-list {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .food-item {
+            display: flex;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .food-item:last-child {
+            border-bottom: none;
+        }
+        .food-info {
+            flex: 1;
+        }
+        .food-name {
+            font-size: 15px;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .food-quantity {
+            font-size: 12px;
+            color: #969799;
+        }
+        .food-calories {
+            font-size: 14px;
+            font-weight: 500;
+            color: #323233;
+        }
+        .empty-meal {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .empty-icon {
+            font-size: 24px;
+            color: #c8c9cc;
+            margin-bottom: 8px;
+        }
+        .empty-text {
+            font-size: 14px;
+            color: #969799;
+        }
+        .add-food-button {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: #1989fa;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(25, 137, 250, 0.4);
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            display: flex;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #646566;
+            font-size: 12px;
+        }
+        .nav-item.active {
+            color: #1989fa;
+        }
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <i class="van-icon van-icon-arrow-left header-back" onclick="window.history.back()"></i>
+            <div class="header-title">饮食记录</div>
+            <div class="header-action">
+                <i class="van-icon van-icon-chart-trending-o"></i>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="date-selector">
+                <div class="date-arrow">
+                    <i class="van-icon van-icon-arrow-left"></i>
+                </div>
+                <div class="date-text">2023年6月15日 星期四</div>
+                <div class="date-arrow">
+                    <i class="van-icon van-icon-arrow"></i>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-header">
+                    <div class="summary-title">今日热量</div>
+                    <div class="summary-value">1358 / 2000 千卡</div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 67.9%;"></div>
+                    </div>
+                    <div class="progress-labels">
+                        <div>0</div>
+                        <div>已完成 67.9%</div>
+                        <div>2000</div>
+                    </div>
+                </div>
+                
+                <div class="nutrient-grid">
+                    <div class="nutrient-item">
+                        <div class="nutrient-value protein-value">83g</div>
+                        <div class="nutrient-label">蛋白质</div>
+                        <div class="nutrient-percent">124g / 67%</div>
+                    </div>
+                    <div class="nutrient-item">
+                        <div class="nutrient-value carbs-value">175g</div>
+                        <div class="nutrient-label">碳水化合物</div>
+                        <div class="nutrient-percent">250g / 70%</div>
+                    </div>
+                    <div class="nutrient-item">
+                        <div class="nutrient-value fat-value">45g</div>
+                        <div class="nutrient-label">脂肪</div>
+                        <div class="nutrient-percent">67g / 67%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="meal-section">
+                <div class="meal-header">
+                    <div class="meal-title">
+                        <div class="meal-icon">
+                            <i class="van-icon van-icon-good-job-o"></i>
+                        </div>
+                        早餐
+                    </div>
+                    <div class="meal-calories">485 千卡</div>
+                </div>
+                
+                <div class="food-list">
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">全麦面包</div>
+                            <div class="food-quantity">2片（90g）</div>
+                        </div>
+                        <div class="food-calories">195 千卡</div>
+                    </div>
+                    
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">煎蛋</div>
+                            <div class="food-quantity">2个（100g）</div>
+                        </div>
+                        <div class="food-calories">155 千卡</div>
+                    </div>
+                    
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">牛奶</div>
+                            <div class="food-quantity">1杯（250ml）</div>
+                        </div>
+                        <div class="food-calories">135 千卡</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="meal-section">
+                <div class="meal-header">
+                    <div class="meal-title">
+                        <div class="meal-icon lunch-icon">
+                            <i class="van-icon van-icon-shop-o"></i>
+                        </div>
+                        午餐
+                    </div>
+                    <div class="meal-calories">532 千卡</div>
+                </div>
+                
+                <div class="food-list">
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">米饭</div>
+                            <div class="food-quantity">1碗（150g）</div>
+                        </div>
+                        <div class="food-calories">195 千卡</div>
+                    </div>
+                    
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">鸡胸肉</div>
+                            <div class="food-quantity">1份（100g）</div>
+                        </div>
+                        <div class="food-calories">165 千卡</div>
+                    </div>
+                    
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">西兰花</div>
+                            <div class="food-quantity">1份（100g）</div>
+                        </div>
+                        <div class="food-calories">34 千卡</div>
+                    </div>
+                    
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">胡萝卜</div>
+                            <div class="food-quantity">1根（80g）</div>
+                        </div>
+                        <div class="food-calories">33 千卡</div>
+                    </div>
+                    
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">橄榄油</div>
+                            <div class="food-quantity">1汤匙（15ml）</div>
+                        </div>
+                        <div class="food-calories">119 千卡</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="meal-section">
+                <div class="meal-header">
+                    <div class="meal-title">
+                        <div class="meal-icon dinner-icon">
+                            <i class="van-icon van-icon-coupon-o"></i>
+                        </div>
+                        晚餐
+                    </div>
+                    <div class="meal-calories">341 千卡</div>
+                </div>
+                
+                <div class="food-list">
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">三文鱼</div>
+                            <div class="food-quantity">1份（100g）</div>
+                        </div>
+                        <div class="food-calories">208 千卡</div>
+                    </div>
+                    
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">藜麦</div>
+                            <div class="food-quantity">1/2杯（100g）</div>
+                        </div>
+                        <div class="food-calories">120 千卡</div>
+                    </div>
+                    
+                    <div class="food-item">
+                        <div class="food-info">
+                            <div class="food-name">芝麻酱</div>
+                            <div class="food-quantity">1汤匙（15g）</div>
+                        </div>
+                        <div class="food-calories">13 千卡</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="meal-section">
+                <div class="meal-header">
+                    <div class="meal-title">
+                        <div class="meal-icon snack-icon">
+                            <i class="van-icon van-icon-gift-o"></i>
+                        </div>
+                        加餐
+                    </div>
+                    <div class="meal-add">添加食物</div>
+                </div>
+                
+                <div class="empty-meal">
+                    <div class="empty-icon">
+                        <i class="van-icon van-icon-plus"></i>
+                    </div>
+                    <div class="empty-text">点击添加食物</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="add-food-button" id="addFoodButton">
+            <i class="van-icon van-icon-plus"></i>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-home-o"></i>
+                </div>
+                <div>首页</div>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-shop-o"></i>
+                </div>
+                <div>饮食</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-chart-trending-o"></i>
+                </div>
+                <div>统计</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-manager-o"></i>
+                </div>
+                <div>我的</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加食物按钮
+            document.getElementById('addFoodButton').addEventListener('click', function() {
+                window.location.href = '食物搜索.html';
+            });
+            
+            // 添加加餐食物
+            document.querySelector('.meal-add').addEventListener('click', function() {
+                window.location.href = '食物搜索.html';
+            });
+            
+            // 点击空白加餐区域
+            document.querySelector('.empty-meal').addEventListener('click', function() {
+                window.location.href = '食物搜索.html';
+            });
+            
+            // 点击食物项进入详情
+            const foodItems = document.querySelectorAll('.food-item');
+            foodItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const foodName = this.querySelector('.food-name').textContent;
+                    if (foodName === '鸡胸肉') {
+                        window.location.href = '食物详情.html';
+                    } else {
+                        alert(`查看${foodName}详情`);
+                    }
+                });
+            });
+            
+            // 日期选择
+            const dateArrows = document.querySelectorAll('.date-arrow');
+            dateArrows.forEach(arrow => {
+                arrow.addEventListener('click', function() {
+                    alert('切换日期功能暂未实现');
+                });
+            });
+            
+            // 点击头部图表按钮
+            document.querySelector('.header-action').addEventListener('click', function() {
+                alert('查看营养摄入趋势图表');
+            });
+            
+            // 底部导航切换
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    const pages = ['首页', '饮食记录', '统计', '个人中心'];
+                    if (index !== 1) { // 不是当前页面
+                        alert(`导航到${pages[index]}页面`);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

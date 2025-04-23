@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 用户注册</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background: #f8f8f8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .back-icon {
+            font-size: 20px;
+            color: #333;
+            margin-right: 12px;
+            text-decoration: none;
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .register-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .app-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #36d1dc, #5b86e5);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(91, 134, 229, 0.3);
+        }
+        .logo-text {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #36d1dc, #5b86e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        .logo-slogan {
+            font-size: 14px;
+            color: #666;
+        }
+        .register-form {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .form-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 24px;
+            color: #333;
+        }
+        .form-item {
+            margin-bottom: 20px;
+        }
+        .form-item label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .form-item input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-item input:focus {
+            border-color: #5b86e5;
+            outline: none;
+        }
+        .verification-code {
+            display: flex;
+            gap: 10px;
+        }
+        .verification-code input {
+            flex: 1;
+        }
+        .get-code-btn {
+            padding: 0 10px;
+            height: 44px;
+            border: none;
+            border-radius: 8px;
+            background: #5b86e5;
+            color: white;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .get-code-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .agreement {
+            display: flex;
+            align-items: center;
+            margin: 15px 0 20px;
+        }
+        .agreement-checkbox {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+        }
+        .agreement-text {
+            font-size: 14px;
+            color: #666;
+        }
+        .agreement-link {
+            color: #5b86e5;
+            text-decoration: none;
+        }
+        .register-btn {
+            width: 100%;
+            padding: 14px 0;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #36d1dc, #5b86e5);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(91, 134, 229, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .register-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(91, 134, 229, 0.2);
+        }
+        .register-btn:disabled {
+            background: #cccccc;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .login-link a {
+            color: #5b86e5;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 480px) {
+            .register-form {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="javascript:history.back()" class="back-icon">
+            ← 
+        </a>
+        <div class="header-title">用户注册</div>
+    </div>
+    
+    <div class="register-container">
+        <div class="logo-container">
+            <div class="app-logo">
+                <span style="color: white; font-size: 32px; font-weight: bold;">爱</span>
+            </div>
+            <div class="logo-text">爱健康</div>
+            <div class="logo-slogan">健康生活，从此开始</div>
+        </div>
+        
+        <div class="register-form">
+            <h2 class="form-title">创建账号</h2>
+            
+            <div class="form-item">
+                <label for="phone">手机号</label>
+                <input type="tel" id="phone" placeholder="请输入手机号码" maxlength="11">
+            </div>
+            
+            <div class="form-item">
+                <label for="verification-code">验证码</label>
+                <div class="verification-code">
+                    <input type="text" id="verification-code" placeholder="请输入验证码" maxlength="6">
+                    <button class="get-code-btn" id="get-code-btn">获取验证码</button>
+                </div>
+            </div>
+            
+            <div class="form-item">
+                <label for="password">设置密码</label>
+                <input type="password" id="password" placeholder="请设置登录密码（6-20位字符）">
+            </div>
+            
+            <div class="form-item">
+                <label for="confirm-password">确认密码</label>
+                <input type="password" id="confirm-password" placeholder="请再次输入密码">
+            </div>
+            
+            <div class="agreement">
+                <input type="checkbox" id="agreement-checkbox" class="agreement-checkbox">
+                <span class="agreement-text">
+                    我已阅读并同意
+                    <a href="用户协议.html" class="agreement-link">《用户协议》</a>
+                    和
+                    <a href="隐私政策.html" class="agreement-link">《隐私政策》</a>
+                </span>
+            </div>
+            
+            <button class="register-btn" id="register-btn" disabled>注册</button>
+        </div>
+        
+        <div class="login-link">
+            已有账号？<a href="登录页.html">立即登录</a>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone');
+            const codeInput = document.getElementById('verification-code');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const agreementCheckbox = document.getElementById('agreement-checkbox');
+            const getCodeBtn = document.getElementById('get-code-btn');
+            const registerBtn = document.getElementById('register-btn');
+            
+            // 验证手机号格式
+            function isValidPhone(phone) {
+                return /^1[3-9]\d{9}$/.test(phone);
+            }
+            
+            // 验证密码格式
+            function isValidPassword(password) {
+                return password.length >= 6 && password.length <= 20;
+            }
+            
+            // 检查注册按钮状态
+            function checkRegisterButtonStatus() {
+                if (
+                    isValidPhone(phoneInput.value) && 
+                    codeInput.value.length === 6 && 
+                    isValidPassword(passwordInput.value) && 
+                    passwordInput.value === confirmPasswordInput.value && 
+                    agreementCheckbox.checked
+                ) {
+                    registerBtn.disabled = false;
+                } else {
+                    registerBtn.disabled = true;
+                }
+            }
+            
+            // 获取验证码倒计时
+            let countdown = 0;
+            function startCountdown() {
+                if (countdown > 0) return;
+                
+                countdown = 60;
+                getCodeBtn.disabled = true;
+                
+                function updateCountdown() {
+                    if (countdown > 0) {
+                        getCodeBtn.textContent = `${countdown}秒后重试`;
+                        countdown--;
+                        setTimeout(updateCountdown, 1000);
+                    } else {
+                        getCodeBtn.disabled = false;
+                        getCodeBtn.textContent = '获取验证码';
+                    }
+                }
+                
+                updateCountdown();
+            }
+            
+            // 获取验证码
+            getCodeBtn.addEventListener('click', function() {
+                if (!isValidPhone(phoneInput.value)) {
+                    alert('请输入正确的手机号码');
+                    return;
+                }
+                
+                // 模拟发送验证码请求
+                setTimeout(() => {
+                    alert(`验证码已发送至手机号：${phoneInput.value}`);
+                    startCountdown();
+                }, 500);
+            });
+            
+            // 注册提交
+            registerBtn.addEventListener('click', function() {
+                // 模拟注册请求
+                setTimeout(() => {
+                    alert('注册成功！');
+                    window.location.href = '登录页.html';
+                }, 1000);
+            });
+            
+            // 添加输入事件监听
+            [phoneInput, codeInput, passwordInput, confirmPasswordInput, agreementCheckbox].forEach(el => {
+                el.addEventListener('input', checkRegisterButtonStatus);
+                el.addEventListener('change', checkRegisterButtonStatus);
+            });
+            
+            // 初始检查按钮状态
+            checkRegisterButtonStatus();
+        });
+    </script>
+</body>
+</html> 

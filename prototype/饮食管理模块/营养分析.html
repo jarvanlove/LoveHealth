@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 营养分析</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 60px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, #1989fa, #39a9ed);
+            color: white;
+            display: flex;
+            align-items: center;
+            height: 56px;
+            padding: 0 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header-back {
+            font-size: 20px;
+            color: white;
+            margin-right: 16px;
+        }
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+        }
+        .header-action {
+            font-size: 20px;
+            padding: 4px;
+        }
+        .content {
+            padding-top: 56px;
+        }
+        .tabs-container {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            background: white;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+        .tabs {
+            display: flex;
+            padding: 0 16px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .tab {
+            position: relative;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #646566;
+        }
+        .tab.active {
+            color: #1989fa;
+            font-weight: 500;
+        }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: #1989fa;
+            border-radius: 3px;
+        }
+        .period-selector {
+            position: fixed;
+            top: 100px;
+            left: 0;
+            right: 0;
+            z-index: 98;
+            background: white;
+            display: flex;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .period-button {
+            flex: 1;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border-radius: 16px;
+            background: #f7f8fa;
+            color: #646566;
+            margin: 0 4px;
+        }
+        .period-button.active {
+            background: #1989fa;
+            color: white;
+        }
+        .summary-section {
+            margin-top: 144px;
+            padding: 16px;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .title-right {
+            font-size: 12px;
+            color: #969799;
+            font-weight: normal;
+        }
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+        .chart-placeholder {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-bars {
+            display: flex;
+            height: 160px;
+            justify-content: space-around;
+            align-items: flex-end;
+            margin-bottom: 12px;
+        }
+        .chart-bar {
+            width: 20px;
+            background: linear-gradient(to top, #1989fa, #39a9ed);
+            border-radius: 2px 2px 0 0;
+            position: relative;
+        }
+        .chart-bar.selected {
+            background: linear-gradient(to top, #ff9f66, #ff8859);
+        }
+        .chart-bar-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #1989fa;
+            white-space: nowrap;
+        }
+        .chart-bar.selected .chart-bar-value {
+            color: #ff9f66;
+        }
+        .chart-bar-label {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #969799;
+            white-space: nowrap;
+        }
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+            gap: 16px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #646566;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            margin-right: 4px;
+            border-radius: 2px;
+        }
+        .legend-blue {
+            background: #1989fa;
+        }
+        .legend-orange {
+            background: #ff9f66;
+        }
+        .nutrient-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .nutrient-header {
+            padding: 16px;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .nutrient-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            margin-bottom: 8px;
+        }
+        .nutrient-subtitle {
+            font-size: 12px;
+            color: #969799;
+        }
+        .pie-chart {
+            height: 200px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .pie-center {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+        .pie-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1989fa;
+        }
+        .pie-label {
+            font-size: 12px;
+            color: #969799;
+        }
+        .pie-ring {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #1989fa 0% 50%, 
+                #ff9f66 50% 75%, 
+                #ee0a24 75% 100%
+            );
+        }
+        .pie-legend {
+            display: flex;
+            justify-content: space-around;
+            padding: 0 16px 16px;
+        }
+        .pie-legend-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .legend-value {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .carbs-value {
+            color: #1989fa;
+        }
+        .protein-value {
+            color: #ff9f66;
+        }
+        .fat-value {
+            color: #ee0a24;
+        }
+        .legend-name {
+            font-size: 12px;
+            color: #969799;
+        }
+        .legend-percent {
+            font-size: 12px;
+            color: #646566;
+            margin-top: 2px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .stats-title {
+            font-size: 14px;
+            color: #969799;
+            margin-bottom: 8px;
+        }
+        .stats-value {
+            font-size: 20px;
+            font-weight: 500;
+            color: #323233;
+        }
+        .stats-trend {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .trend-up {
+            color: #ee0a24;
+        }
+        .trend-down {
+            color: #07c160;
+        }
+        .trend-icon {
+            font-size: 14px;
+            margin-right: 2px;
+        }
+        .meals-section {
+            padding: 0 16px 16px;
+        }
+        .meals-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            margin-bottom: 12px;
+        }
+        .meal-chart {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .meal-distribution {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .meal-bar {
+            flex: 1;
+            height: 24px;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #f7f8fa;
+        }
+        .meal-segment {
+            position: absolute;
+            height: 100%;
+            top: 0;
+        }
+        .breakfast-segment {
+            left: 0;
+            width: 30%;
+            background: #1989fa;
+        }
+        .lunch-segment {
+            left: 30%;
+            width: 40%;
+            background: #ff9f66;
+        }
+        .dinner-segment {
+            left: 70%;
+            width: 20%;
+            background: #ee0a24;
+        }
+        .snack-segment {
+            left: 90%;
+            width: 10%;
+            background: #9c27b0;
+        }
+        .meal-label {
+            margin-left: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #323233;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            display: flex;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #646566;
+            font-size: 12px;
+        }
+        .nav-item.active {
+            color: #1989fa;
+        }
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <i class="van-icon van-icon-arrow-left header-back" onclick="window.history.back()"></i>
+            <div class="header-title">营养分析</div>
+            <div class="header-action">
+                <i class="van-icon van-icon-share-o"></i>
+            </div>
+        </div>
+        
+        <div class="tabs-container">
+            <div class="tabs">
+                <div class="tab active">总览</div>
+                <div class="tab">热量</div>
+                <div class="tab">蛋白质</div>
+                <div class="tab">碳水</div>
+                <div class="tab">脂肪</div>
+                <div class="tab">微量元素</div>
+            </div>
+        </div>
+        
+        <div class="period-selector">
+            <div class="period-button">日</div>
+            <div class="period-button active">周</div>
+            <div class="period-button">月</div>
+            <div class="period-button">年</div>
+        </div>
+        
+        <div class="content">
+            <div class="summary-section">
+                <div class="chart-card">
+                    <div class="card-title">
+                        <span>热量摄入趋势</span>
+                        <span class="title-right">2023.6.1-2023.6.7</span>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-bars">
+                            <div class="chart-bar" style="height: 70%;">
+                                <div class="chart-bar-value">1400</div>
+                                <div class="chart-bar-label">1日</div>
+                            </div>
+                            <div class="chart-bar" style="height: 85%;">
+                                <div class="chart-bar-value">1700</div>
+                                <div class="chart-bar-label">2日</div>
+                            </div>
+                            <div class="chart-bar" style="height: 60%;">
+                                <div class="chart-bar-value">1200</div>
+                                <div class="chart-bar-label">3日</div>
+                            </div>
+                            <div class="chart-bar" style="height: 80%;">
+                                <div class="chart-bar-value">1600</div>
+                                <div class="chart-bar-label">4日</div>
+                            </div>
+                            <div class="chart-bar" style="height: 75%;">
+                                <div class="chart-bar-value">1500</div>
+                                <div class="chart-bar-label">5日</div>
+                            </div>
+                            <div class="chart-bar selected" style="height: 65%;">
+                                <div class="chart-bar-value">1300</div>
+                                <div class="chart-bar-label">6日</div>
+                            </div>
+                            <div class="chart-bar" style="height: 90%;">
+                                <div class="chart-bar-value">1800</div>
+                                <div class="chart-bar-label">7日</div>
+                            </div>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-color legend-blue"></div>
+                                <span>日常摄入</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color legend-orange"></div>
+                                <span>当前选中</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nutrient-card">
+                    <div class="nutrient-header">
+                        <div class="nutrient-title">营养素分布</div>
+                        <div class="nutrient-subtitle">近7天平均值</div>
+                    </div>
+                    <div class="pie-chart">
+                        <div class="pie-ring"></div>
+                        <div class="pie-center">
+                            <div class="pie-value">1500</div>
+                            <div class="pie-label">千卡/天</div>
+                        </div>
+                    </div>
+                    <div class="pie-legend">
+                        <div class="pie-legend-item">
+                            <div class="legend-value carbs-value">187g</div>
+                            <div class="legend-name">碳水</div>
+                            <div class="legend-percent">50%</div>
+                        </div>
+                        <div class="pie-legend-item">
+                            <div class="legend-value protein-value">94g</div>
+                            <div class="legend-name">蛋白质</div>
+                            <div class="legend-percent">25%</div>
+                        </div>
+                        <div class="pie-legend-item">
+                            <div class="legend-value fat-value">50g</div>
+                            <div class="legend-name">脂肪</div>
+                            <div class="legend-percent">25%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stats-card">
+                        <div class="stats-title">平均热量</div>
+                        <div class="stats-value">1500 千卡</div>
+                        <div class="stats-trend trend-down">
+                            <i class="van-icon van-icon-arrow-down trend-icon"></i>
+                            较上周下降 5%
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-title">目标完成率</div>
+                        <div class="stats-value">75%</div>
+                        <div class="stats-trend trend-up">
+                            <i class="van-icon van-icon-arrow-up trend-icon"></i>
+                            较上周上升 3%
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-title">蛋白质</div>
+                        <div class="stats-value">94g/天</div>
+                        <div class="stats-trend trend-up">
+                            <i class="van-icon van-icon-arrow-up trend-icon"></i>
+                            较上周上升 8%
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-title">热量缺口</div>
+                        <div class="stats-value">500 千卡</div>
+                        <div class="stats-trend trend-down">
+                            <i class="van-icon van-icon-arrow-down trend-icon"></i>
+                            较上周下降 20%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="meals-section">
+                    <div class="meals-title">餐次分布</div>
+                    <div class="meal-chart">
+                        <div class="meal-distribution">
+                            <div class="meal-bar">
+                                <div class="meal-segment breakfast-segment"></div>
+                                <div class="meal-segment lunch-segment"></div>
+                                <div class="meal-segment dinner-segment"></div>
+                                <div class="meal-segment snack-segment"></div>
+                            </div>
+                            <div class="meal-label">1500 千卡</div>
+                        </div>
+                        <div class="chart-legend" style="margin-top: 16px;">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #1989fa;"></div>
+                                <span>早餐 30%</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ff9f66;"></div>
+                                <span>午餐 40%</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ee0a24;"></div>
+                                <span>晚餐 20%</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #9c27b0;"></div>
+                                <span>加餐 10%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-home-o"></i>
+                </div>
+                <div>首页</div>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-shop-o"></i>
+                </div>
+                <div>饮食</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-chart-trending-o"></i>
+                </div>
+                <div>统计</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-manager-o"></i>
+                </div>
+                <div>我的</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 点击标签页切换
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    alert(`切换到${this.textContent}标签`);
+                });
+            });
+            
+            // 时间周期切换
+            const periodButtons = document.querySelectorAll('.period-button');
+            periodButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    periodButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    alert(`查看${this.textContent}数据`);
+                });
+            });
+            
+            // 点击柱状图切换选中
+            const chartBars = document.querySelectorAll('.chart-bar');
+            chartBars.forEach(bar => {
+                bar.addEventListener('click', function() {
+                    chartBars.forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    alert(`查看${this.querySelector('.chart-bar-label').textContent}数据`);
+                });
+            });
+            
+            // 点击分享按钮
+            document.querySelector('.header-action').addEventListener('click', function() {
+                alert('分享营养分析报告');
+            });
+            
+            // 底部导航切换
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    const pages = ['首页', '饮食记录', '统计', '个人中心'];
+                    if (index !== 1) { // 不是当前页面
+                        alert(`导航到${pages[index]}页面`);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

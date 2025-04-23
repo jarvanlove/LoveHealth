@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 爱健康</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333333;
+            line-height: 1.5;
+        }
+        .page-container {
+            padding-bottom: 50px;
+        }
+        .user-header {
+            background: linear-gradient(to right, #FF4B4B, #FF7676);
+            padding: 20px 16px 30px;
+            color: #fff;
+            position: relative;
+        }
+        .setting-icon {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 24px;
+            color: #fff;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            overflow: hidden;
+            margin-right: 16px;
+        }
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .user-details {
+            flex: 1;
+        }
+        .user-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+        }
+        .vip-badge {
+            font-size: 10px;
+            background-color: #FFD700;
+            color: #333;
+            padding: 1px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+        .user-id {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 6px;
+        }
+        .user-bio {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .edit-profile-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 6px;
+            display: inline-block;
+        }
+        .stats-row {
+            display: flex;
+            background-color: #fff;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-top: -15px;
+            border-radius: 15px 15px 0 0;
+        }
+        .stat-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 10%;
+            height: 80%;
+            width: 1px;
+            background-color: #EEEEEE;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #999999;
+        }
+        .menu-section {
+            background-color: #fff;
+            margin: 12px 0;
+        }
+        .section-header {
+            padding: 12px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #333333;
+            border-bottom: 1px solid #F5F5F5;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            padding: 16px;
+        }
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+        }
+        .menu-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background-color: #FFEBEB;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+            color: #FF4B4B;
+            font-size: 22px;
+        }
+        .menu-label {
+            font-size: 12px;
+            color: #666666;
+        }
+        .health-section {
+            background-color: #fff;
+            margin: 12px 0;
+            padding: 16px;
+        }
+        .health-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .health-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+        }
+        .health-more {
+            font-size: 12px;
+            color: #999999;
+            display: flex;
+            align-items: center;
+        }
+        .health-cards {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 8px;
+        }
+        .health-card {
+            flex: 0 0 150px;
+            background: linear-gradient(135deg, #FFF0F0, #FFEBEB);
+            border-radius: 12px;
+            padding: 14px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .card-icon {
+            font-size: 18px;
+            color: #FF4B4B;
+            margin-bottom: 24px;
+        }
+        .card-title {
+            font-size: 12px;
+            color: #666666;
+            margin-bottom: 4px;
+        }
+        .card-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333333;
+        }
+        .card-unit {
+            font-size: 12px;
+            color: #999999;
+            margin-left: 2px;
+        }
+        .card-trend {
+            font-size: 11px;
+            color: #FF4B4B;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+        }
+        .card-up {
+            color: #FF4B4B;
+        }
+        .card-down {
+            color: #4CAF50;
+        }
+        .content-tabs {
+            background-color: #fff;
+            margin-top: 12px;
+        }
+        .tab-content {
+            min-height: 200px;
+            padding: 10px 0;
+        }
+        .post-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #F5F5F5;
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .post-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+        }
+        .post-time {
+            font-size: 12px;
+            color: #999999;
+        }
+        .post-content {
+            font-size: 13px;
+            color: #666666;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .post-images {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .post-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999999;
+        }
+        .post-action {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+        }
+        .post-action i {
+            font-size: 14px;
+            margin-right: 4px;
+        }
+        .badge-new {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            background-color: #FF4B4B;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+        .badge-activity {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #FF4B4B;
+        }
+        .notification-section {
+            background-color: #fff;
+            margin: 12px 0;
+        }
+        .notification-item {
+            display: flex;
+            padding: 14px 16px;
+            border-bottom: 1px solid #F5F5F5;
+            position: relative;
+        }
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #FFEBEB;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 12px;
+            color: #FF4B4B;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .notification-content {
+            flex: 1;
+        }
+        .notification-title {
+            font-size: 14px;
+            color: #333333;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .notification-desc {
+            font-size: 12px;
+            color: #999999;
+        }
+        .notification-time {
+            font-size: 12px;
+            color: #BBBBBB;
+            position: absolute;
+            right: 16px;
+            top: 14px;
+        }
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+            color: #999999;
+        }
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #DDDDDD;
+        }
+        .empty-text {
+            font-size: 14px;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            height: 50px;
+            background-color: #fff;
+            box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #666666;
+            font-size: 10px;
+        }
+        .nav-item.active {
+            color: #FF4B4B;
+        }
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="page-container">
+            <div class="user-header">
+                <van-icon name="setting-o" class="setting-icon" @click="goToSettings" />
+                
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <img :src="userInfo.avatar" :alt="userInfo.name" />
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">
+                            {{ userInfo.name }}
+                            <span class="vip-badge" v-if="userInfo.isVip">健康VIP</span>
+                        </div>
+                        <div class="user-id">ID: {{ userInfo.id }}</div>
+                        <div class="user-bio">{{ userInfo.bio }}</div>
+                        <div class="edit-profile-btn" @click="editProfile">编辑资料</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-item" @click="viewStats('posts')">
+                    <div class="stat-value">{{ userStats.posts }}</div>
+                    <div class="stat-label">帖子</div>
+                </div>
+                <div class="stat-item" @click="viewStats('followers')">
+                    <div class="stat-value">{{ userStats.followers }}</div>
+                    <div class="stat-label">粉丝</div>
+                </div>
+                <div class="stat-item" @click="viewStats('following')">
+                    <div class="stat-value">{{ userStats.following }}</div>
+                    <div class="stat-label">关注</div>
+                </div>
+                <div class="stat-item" @click="viewStats('likes')">
+                    <div class="stat-value">{{ userStats.likes }}</div>
+                    <div class="stat-label">获赞</div>
+                </div>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-grid">
+                    <div class="menu-item" v-for="(item, index) in menuItems" :key="index" @click="navigateTo(item.link)">
+                        <div class="menu-icon">
+                            <van-icon :name="item.icon" />
+                        </div>
+                        <div class="menu-label">{{ item.label }}</div>
+                        <div class="badge-new" v-if="item.isNew">新</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="health-section">
+                <div class="health-header">
+                    <div class="health-title">我的健康数据</div>
+                    <div class="health-more" @click="viewAllHealthData">
+                        全部
+                        <van-icon name="arrow" style="margin-left: 2px;" />
+                    </div>
+                </div>
+                
+                <div class="health-cards">
+                    <div class="health-card" v-for="(data, index) in healthData" :key="index" @click="viewHealthDetail(data.type)">
+                        <div class="card-icon">
+                            <van-icon :name="data.icon" />
+                        </div>
+                        <div class="card-title">{{ data.title }}</div>
+                        <div class="card-value">
+                            {{ data.value }}
+                            <span class="card-unit">{{ data.unit }}</span>
+                        </div>
+                        <div class="card-trend" :class="{ 'card-up': data.trend > 0, 'card-down': data.trend < 0 }">
+                            <van-icon :name="data.trend > 0 ? 'arrow-up' : 'arrow-down'" style="margin-right: 2px;" v-if="data.trend !== 0" />
+                            {{ data.trendText }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-tabs">
+                <van-tabs v-model:active="activeTab" color="#FF4B4B" background="#ffffff" sticky swipeable animated>
+                    <van-tab title="动态">
+                        <div class="tab-content">
+                            <div v-if="posts.length > 0">
+                                <div class="post-item" v-for="(post, index) in posts" :key="index" @click="viewPostDetail(post)">
+                                    <div class="post-header">
+                                        <div class="post-title">{{ post.title }}</div>
+                                        <div class="post-time">{{ post.time }}</div>
+                                    </div>
+                                    <div class="post-content">{{ post.content }}</div>
+                                    <div class="post-images" v-if="post.images && post.images.length > 0">
+                                        <img v-for="(img, imgIndex) in post.images.slice(0, 3)" :key="imgIndex" :src="img" class="post-image" />
+                                    </div>
+                                    <div class="post-footer">
+                                        <div style="display: flex;">
+                                            <div class="post-action">
+                                                <van-icon name="like-o" />
+                                                <span>{{ post.likes }}</span>
+                                            </div>
+                                            <div class="post-action">
+                                                <van-icon name="chat-o" />
+                                                <span>{{ post.comments }}</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="post-action">
+                                                <van-icon name="share-o" />
+                                                <span>分享</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="empty-state">
+                                <van-icon name="description" class="empty-icon" />
+                                <div class="empty-text">还没有发布动态</div>
+                            </div>
+                        </div>
+                    </van-tab>
+                    <van-tab title="收藏">
+                        <div class="tab-content">
+                            <div v-if="favorites.length > 0">
+                                <div class="post-item" v-for="(favorite, index) in favorites" :key="index" @click="viewFavoriteDetail(favorite)">
+                                    <div class="post-header">
+                                        <div class="post-title">{{ favorite.title }}</div>
+                                        <div class="post-time">{{ favorite.time }}</div>
+                                    </div>
+                                    <div class="post-content">{{ favorite.content }}</div>
+                                    <div class="post-images" v-if="favorite.images && favorite.images.length > 0">
+                                        <img v-for="(img, imgIndex) in favorite.images.slice(0, 3)" :key="imgIndex" :src="img" class="post-image" />
+                                    </div>
+                                    <div class="post-footer">
+                                        <div style="display: flex;">
+                                            <div class="post-action">
+                                                <van-icon name="like-o" />
+                                                <span>{{ favorite.likes }}</span>
+                                            </div>
+                                            <div class="post-action">
+                                                <van-icon name="chat-o" />
+                                                <span>{{ favorite.comments }}</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="post-action">
+                                                <van-icon name="delete-o" />
+                                                <span>取消收藏</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="empty-state">
+                                <van-icon name="star-o" class="empty-icon" />
+                                <div class="empty-text">还没有收藏内容</div>
+                            </div>
+                        </div>
+                    </van-tab>
+                    <van-tab title="关注">
+                        <div class="tab-content">
+                            <div v-if="followings.length > 0">
+                                <div class="notification-item" v-for="(following, index) in followings" :key="index" @click="viewUserProfile(following)">
+                                    <div class="user-avatar" style="width: 40px; height: 40px; margin-right: 12px;">
+                                        <img :src="following.avatar" :alt="following.name" />
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">{{ following.name }}</div>
+                                        <div class="notification-desc">{{ following.bio }}</div>
+                                    </div>
+                                    <div style="margin-left: 8px;">
+                                        <van-button size="small" type="danger" plain round>已关注</van-button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="empty-state">
+                                <van-icon name="friends-o" class="empty-icon" />
+                                <div class="empty-text">还没有关注任何人</div>
+                            </div>
+                        </div>
+                    </van-tab>
+                </van-tabs>
+            </div>
+            
+            <div class="notification-section">
+                <div class="section-header">消息通知</div>
+                
+                <div class="notification-item" v-for="(notification, index) in notifications" :key="index" @click="viewNotification(notification)">
+                    <div class="notification-icon">
+                        <van-icon :name="notification.icon" />
+                        <div class="badge-activity" v-if="!notification.read"></div>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">{{ notification.title }}</div>
+                        <div class="notification-desc">{{ notification.description }}</div>
+                    </div>
+                    <div class="notification-time">{{ notification.time }}</div>
+                </div>
+            </div>
+            
+            <div class="menu-section">
+                <div class="section-header">我的订单</div>
+                <div class="menu-grid">
+                    <div class="menu-item" v-for="(item, index) in orderMenuItems" :key="index" @click="navigateTo(item.link)">
+                        <div class="menu-icon">
+                            <van-icon :name="item.icon" />
+                        </div>
+                        <div class="menu-label">{{ item.label }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bottom-nav">
+                <div class="nav-item" @click="navigateTo('../首页模块/首页.html')">
+                    <van-icon name="home-o" class="nav-icon" />
+                    <span>首页</span>
+                </div>
+                <div class="nav-item" @click="navigateTo('../社区模块/社区首页.html')">
+                    <van-icon name="friends-o" class="nav-icon" />
+                    <span>社区</span>
+                </div>
+                <div class="nav-item" @click="navigateTo('../食谱推荐模块/食谱主页.html')">
+                    <van-icon name="fire-o" class="nav-icon" />
+                    <span>食谱</span>
+                </div>
+                <div class="nav-item" @click="navigateTo('../知识Club模块/知识首页.html')">
+                    <van-icon name="bookmark-o" class="nav-icon" />
+                    <span>知识</span>
+                </div>
+                <div class="nav-item active">
+                    <van-icon name="manager" class="nav-icon" />
+                    <span>我的</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp, ref, reactive } = Vue;
+        
+        createApp({
+            setup() {
+                // 活动标签页
+                const activeTab = ref(0);
+                
+                const userInfo = reactive({
+                    name: '张健康',
+                    id: '20240608',
+                    avatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                    bio: '热爱生活，追求健康的生活方式',
+                    isVip: true
+                });
+                
+                const userStats = reactive({
+                    posts: 32,
+                    followers: 168,
+                    following: 86,
+                    likes: 325
+                });
+                
+                const menuItems = ref([
+                    { icon: 'star', label: '我的收藏', link: 'collections' },
+                    { icon: 'clock', label: '浏览历史', link: 'history' },
+                    { icon: 'medal-o', label: '健康成就', link: 'achievements' },
+                    { icon: 'chart-trending-o', label: '健康报告', link: 'reports', isNew: true },
+                    { icon: 'balance-o', label: '营养分析', link: 'nutrition' },
+                    { icon: 'guide-o', label: '运动计划', link: 'exercise' },
+                    { icon: 'calendar-o', label: '健康日历', link: 'calendar' },
+                    { icon: 'service-o', label: '在线咨询', link: 'consultation' }
+                ]);
+                
+                const orderMenuItems = ref([
+                    { icon: 'pending-payment', label: '待付款', link: 'pending-payment' },
+                    { icon: 'logistics', label: '待收货', link: 'to-receive' },
+                    { icon: 'comment-o', label: '待评价', link: 'to-review' },
+                    { icon: 'after-sale', label: '退款/售后', link: 'after-sale' }
+                ]);
+                
+                const healthData = ref([
+                    { 
+                        type: 'steps', 
+                        title: '今日步数', 
+                        value: '8,546', 
+                        unit: '步', 
+                        trend: 1, 
+                        trendText: '较昨日 +1,203', 
+                        icon: 'guide-o'
+                    },
+                    { 
+                        type: 'sleep', 
+                        title: '昨晚睡眠', 
+                        value: '7.5', 
+                        unit: '小时', 
+                        trend: 1, 
+                        trendText: '较前日 +0.8h', 
+                        icon: 'wap-home'
+                    },
+                    { 
+                        type: 'weight', 
+                        title: '体重', 
+                        value: '65.8', 
+                        unit: 'kg', 
+                        trend: -1, 
+                        trendText: '本周 -0.6kg', 
+                        icon: 'balance-list-o'
+                    },
+                    { 
+                        type: 'heart', 
+                        title: '心率', 
+                        value: '72', 
+                        unit: 'bpm', 
+                        trend: 0, 
+                        trendText: '正常范围', 
+                        icon: 'like-o'
+                    }
+                ]);
+                
+                const posts = ref([
+                    {
+                        id: 1,
+                        title: '今日健身记录',
+                        content: '今天完成了30分钟跑步和力量训练，感觉状态不错，继续保持！慢慢提升自己的体能水平，希望能够坚持下去。',
+                        time: '2小时前',
+                        images: [
+                            'https://img.yzcdn.cn/vant/cat.jpeg',
+                            'https://img.yzcdn.cn/vant/cat.jpeg'
+                        ],
+                        likes: 28,
+                        comments: 5
+                    },
+                    {
+                        id: 2,
+                        title: '分享一道健康早餐',
+                        content: '今天做了燕麦牛奶配水果，简单营养又美味，推荐给大家！富含膳食纤维，有助于肠道健康。',
+                        time: '昨天',
+                        images: [
+                            'https://img.yzcdn.cn/vant/cat.jpeg'
+                        ],
+                        likes: 42,
+                        comments: 12
+                    }
+                ]);
+                
+                const favorites = ref([
+                    {
+                        id: 101,
+                        type: 'recipe',
+                        title: '低脂鸡胸肉沙拉',
+                        content: '这道沙拉富含蛋白质，低脂低卡，非常适合健身后食用，能够帮助肌肉恢复。',
+                        time: '3天前',
+                        images: [
+                            'https://img.yzcdn.cn/vant/cat.jpeg'
+                        ],
+                        likes: 156,
+                        comments: 23
+                    },
+                    {
+                        id: 102,
+                        type: 'article',
+                        title: '科学减脂全攻略',
+                        content: '这篇文章详细介绍了如何科学减脂，避免节食导致的反弹问题，值得收藏参考。',
+                        time: '上周',
+                        likes: 287,
+                        comments: 45
+                    }
+                ]);
+                
+                const followings = ref([
+                    {
+                        id: 201,
+                        name: '健康达人小王',
+                        bio: '专注分享健康生活方式，营养师认证',
+                        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg'
+                    },
+                    {
+                        id: 202,
+                        name: '厨艺小能手',
+                        bio: '分享简单易做的健康食谱，让美食与健康并存',
+                        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg'
+                    },
+                    {
+                        id: 203,
+                        name: '运动指导师林教练',
+                        bio: '专业健身教练，提供科学的运动建议',
+                        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg'
+                    }
+                ]);
+                
+                const notifications = ref([
+                    {
+                        icon: 'chat-o',
+                        title: '消息提醒',
+                        description: '健康达人回复了您的评论',
+                        time: '10分钟前',
+                        read: false,
+                        id: 1
+                    },
+                    {
+                        icon: 'friends-o',
+                        title: '好友通知',
+                        description: '张医生关注了您',
+                        time: '2小时前',
+                        read: false,
+                        id: 2
+                    },
+                    {
+                        icon: 'gem-o',
+                        title: '会员特权',
+                        description: '您有3个未使用的VIP专属优惠券',
+                        time: '昨天',
+                        read: true,
+                        id: 3
+                    }
+                ]);
+                
+                const navigateTo = (link) => {
+                    console.log(`导航到: ${link}`);
+                    if (link.includes('.html')) {
+                        window.location.href = link;
+                    } else {
+                        vant.showToast(`导航到: ${link}`);
+                    }
+                };
+                
+                const goToSettings = () => {
+                    vant.showToast('进入设置页面');
+                };
+                
+                const editProfile = () => {
+                    vant.showToast('编辑个人资料');
+                };
+                
+                const viewStats = (type) => {
+                    vant.showToast(`查看${type}统计`);
+                };
+                
+                const viewAllHealthData = () => {
+                    vant.showToast('查看所有健康数据');
+                };
+                
+                const viewHealthDetail = (type) => {
+                    vant.showToast(`查看${type}详情`);
+                };
+                
+                const viewPostDetail = (post) => {
+                    vant.showToast(`查看帖子: ${post.title}`);
+                };
+                
+                const viewFavoriteDetail = (favorite) => {
+                    vant.showToast(`查看收藏: ${favorite.title}`);
+                };
+                
+                const viewUserProfile = (user) => {
+                    vant.showToast(`查看用户: ${user.name}`);
+                };
+                
+                const viewNotification = (notification) => {
+                    vant.showToast(`查看通知: ${notification.title}`);
+                    // 标记为已读
+                    notification.read = true;
+                };
+                
+                return {
+                    activeTab,
+                    userInfo,
+                    userStats,
+                    menuItems,
+                    orderMenuItems,
+                    healthData,
+                    posts,
+                    favorites,
+                    followings,
+                    notifications,
+                    navigateTo,
+                    goToSettings,
+                    editProfile,
+                    viewStats,
+                    viewAllHealthData,
+                    viewHealthDetail,
+                    viewPostDetail,
+                    viewFavoriteDetail,
+                    viewUserProfile,
+                    viewNotification
+                };
+            }
+        }).use(vant).mount('#app');
+    </script>
+</body>
+</html> 

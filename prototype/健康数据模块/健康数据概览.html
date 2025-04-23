@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 健康数据概览</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 50px;
+        }
+        .header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            flex: 1;
+            text-align: center;
+        }
+        .back-icon {
+            font-size: 20px;
+            color: #323233;
+        }
+        .data-tabs {
+            display: flex;
+            background: #fff;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 14px;
+            color: #323233;
+            position: relative;
+        }
+        .tab-item.active {
+            color: #5b86e5;
+            font-weight: bold;
+        }
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: #5b86e5;
+            border-radius: 3px;
+        }
+        .date-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #fff;
+            margin-bottom: 10px;
+        }
+        .date-button {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #5b86e5;
+        }
+        .date-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #323233;
+        }
+        .chart-card {
+            background: #fff;
+            margin: 0 12px 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #f2f2f2;
+        }
+        .chart-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #323233;
+            display: flex;
+            align-items: center;
+        }
+        .chart-title-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #36d1dc, #5b86e5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+        .chart-more {
+            color: #969799;
+            font-size: 14px;
+        }
+        .chart-content {
+            padding: 20px 16px;
+            position: relative;
+        }
+        .chart-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(180deg, rgba(91, 134, 229, 0.2) 0%, rgba(91, 134, 229, 0.05) 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 300 100'%3E%3Cpath d='M0,90 Q25,40 50,60 T100,50 T150,20 T200,40 T250,30 T300,40' stroke='%235b86e5' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+        .chart-dots {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .chart-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border: 2px solid #5b86e5;
+            border-radius: 50%;
+            position: absolute;
+        }
+        .chart-dot-1 { left: 16.6%; top: 40%; }
+        .chart-dot-2 { left: 33.3%; top: 60%; }
+        .chart-dot-3 { left: 50%; top: 50%; }
+        .chart-dot-4 { left: 66.6%; top: 20%; }
+        .chart-dot-5 { left: 83.3%; top: 40%; }
+        
+        .data-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        .data-item {
+            text-align: center;
+        }
+        .data-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .data-label {
+            font-size: 12px;
+            color: #969799;
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 0 12px;
+        }
+        .grid-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        .grid-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #323233;
+        }
+        .grid-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .icon-steps { background: linear-gradient(135deg, #36d1dc, #5b86e5); }
+        .icon-heart { background: linear-gradient(135deg, #FF9966, #FF5E62); }
+        .icon-calories { background: linear-gradient(135deg, #FF9A9E, #FAD0C4); }
+        .icon-sleep { background: linear-gradient(135deg, #A18CD1, #FBC2EB); }
+        
+        .grid-data {
+            display: flex;
+            align-items: baseline;
+        }
+        .grid-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 6px;
+        }
+        .grid-unit {
+            font-size: 12px;
+            color: #969799;
+        }
+        .grid-progress {
+            margin-top: 8px;
+            height: 4px;
+            background: #f2f3f5;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 2px;
+        }
+        .progress-steps { background: linear-gradient(90deg, #36d1dc, #5b86e5); width: 62.8%; }
+        .progress-heart { background: linear-gradient(90deg, #FF9966, #FF5E62); width: 75%; }
+        .progress-calories { background: linear-gradient(90deg, #FF9A9E, #FAD0C4); width: 71%; }
+        .progress-sleep { background: linear-gradient(90deg, #A18CD1, #FBC2EB); width: 82%; }
+        
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            background: white;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .tab-bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            font-size: 10px;
+            color: #969799;
+            text-decoration: none;
+        }
+        .tab-bar-item.active {
+            color: #5b86e5;
+        }
+        .tab-bar-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <a href="../首页模块/首页.html" class="back-icon">
+                <i class="van-icon van-icon-arrow-left"></i>
+            </a>
+            <div class="header-title">健康数据</div>
+            <div style="width: 20px;"></div> <!-- 占位元素使标题居中 -->
+        </div>
+        
+        <div class="data-tabs">
+            <div class="tab-item active">日</div>
+            <div class="tab-item">周</div>
+            <div class="tab-item">月</div>
+            <div class="tab-item">年</div>
+        </div>
+        
+        <div class="date-selector">
+            <div class="date-button">
+                <i class="van-icon van-icon-arrow-left" style="margin-right: 4px;"></i>
+                前一天
+            </div>
+            <div class="date-text">2023年7月15日</div>
+            <div class="date-button" style="color: #c8c9cc;">
+                后一天
+                <i class="van-icon van-icon-arrow" style="margin-left: 4px;"></i>
+            </div>
+        </div>
+        
+        <div class="data-grid">
+            <div class="grid-card">
+                <div class="grid-title">
+                    <div class="grid-icon icon-steps">
+                        <i class="van-icon van-icon-guide-o"></i>
+                    </div>
+                    步数
+                </div>
+                <div class="grid-data">
+                    <div class="grid-value">6,280</div>
+                    <div class="grid-unit">步/10,000</div>
+                </div>
+                <div class="grid-progress">
+                    <div class="progress-bar progress-steps"></div>
+                </div>
+            </div>
+            
+            <div class="grid-card">
+                <div class="grid-title">
+                    <div class="grid-icon icon-heart">
+                        <i class="van-icon van-icon-like-o"></i>
+                    </div>
+                    心率
+                </div>
+                <div class="grid-data">
+                    <div class="grid-value">75</div>
+                    <div class="grid-unit">次/分钟</div>
+                </div>
+                <div class="grid-progress">
+                    <div class="progress-bar progress-heart"></div>
+                </div>
+            </div>
+            
+            <div class="grid-card">
+                <div class="grid-title">
+                    <div class="grid-icon icon-calories">
+                        <i class="van-icon van-icon-fire-o"></i>
+                    </div>
+                    消耗热量
+                </div>
+                <div class="grid-data">
+                    <div class="grid-value">1,420</div>
+                    <div class="grid-unit">千卡/2,000</div>
+                </div>
+                <div class="grid-progress">
+                    <div class="progress-bar progress-calories"></div>
+                </div>
+            </div>
+            
+            <div class="grid-card">
+                <div class="grid-title">
+                    <div class="grid-icon icon-sleep">
+                        <i class="van-icon van-icon-hotel-o"></i>
+                    </div>
+                    睡眠时长
+                </div>
+                <div class="grid-data">
+                    <div class="grid-value">6.5</div>
+                    <div class="grid-unit">小时/8.0</div>
+                </div>
+                <div class="grid-progress">
+                    <div class="progress-bar progress-sleep"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-card" style="margin-top: 15px;">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <div class="chart-title-icon">
+                        <i class="van-icon van-icon-guide-o"></i>
+                    </div>
+                    步数趋势
+                </div>
+                <div class="chart-more" onclick="location.href='体重记录.html'">查看详情</div>
+            </div>
+            <div class="chart-content">
+                <div class="chart-placeholder">
+                    <div class="chart-line"></div>
+                    <div class="chart-dots">
+                        <div class="chart-dot chart-dot-1"></div>
+                        <div class="chart-dot chart-dot-2"></div>
+                        <div class="chart-dot chart-dot-3"></div>
+                        <div class="chart-dot chart-dot-4"></div>
+                        <div class="chart-dot chart-dot-5"></div>
+                    </div>
+                </div>
+                <div class="data-summary">
+                    <div class="data-item">
+                        <div class="data-value">9,876</div>
+                        <div class="data-label">最高</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value">7,651</div>
+                        <div class="data-label">平均</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value">5,241</div>
+                        <div class="data-label">最低</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <div class="chart-title-icon" style="background: linear-gradient(135deg, #FF9966, #FF5E62);">
+                        <i class="van-icon van-icon-like-o"></i>
+                    </div>
+                    心率变化
+                </div>
+                <div class="chart-more" onclick="location.href='心率记录.html'">查看详情</div>
+            </div>
+            <div class="chart-content">
+                <div class="chart-placeholder" style="background: linear-gradient(180deg, rgba(255, 94, 98, 0.2) 0%, rgba(255, 94, 98, 0.05) 100%);">
+                    <div class="chart-line" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%25\' height=\'100%25\' viewBox=\'0 0 300 100\'%3E%3Cpath d=\'M0,50 Q30,30 60,50 T120,60 T180,30 T240,70 T300,50\' stroke=\'%23FF5E62\' stroke-width=\'2\' fill=\'none\'/%3E%3C/svg%3E')"></div>
+                    <div class="chart-dots">
+                        <div class="chart-dot chart-dot-1" style="border-color: #FF5E62; top: 30%;"></div>
+                        <div class="chart-dot chart-dot-2" style="border-color: #FF5E62; top: 50%;"></div>
+                        <div class="chart-dot chart-dot-3" style="border-color: #FF5E62; top: 60%;"></div>
+                        <div class="chart-dot chart-dot-4" style="border-color: #FF5E62; top: 30%;"></div>
+                        <div class="chart-dot chart-dot-5" style="border-color: #FF5E62; top: 70%;"></div>
+                    </div>
+                </div>
+                <div class="data-summary">
+                    <div class="data-item">
+                        <div class="data-value">98</div>
+                        <div class="data-label">最高</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value">72</div>
+                        <div class="data-label">平均</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value">62</div>
+                        <div class="data-label">最低</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-bar">
+        <a href="../首页模块/首页.html" class="tab-bar-item">
+            <i class="van-icon van-icon-home-o tab-bar-icon"></i>
+            <span>首页</span>
+        </a>
+        <a href="../饮食管理模块/饮食记录.html" class="tab-bar-item">
+            <i class="van-icon van-icon-like-o tab-bar-icon"></i>
+            <span>饮食</span>
+        </a>
+        <a href="../运动健身模块/运动计划.html" class="tab-bar-item">
+            <i class="van-icon van-icon-fire-o tab-bar-icon"></i>
+            <span>运动</span>
+        </a>
+        <a href="../社区模块/社区.html" class="tab-bar-item">
+            <i class="van-icon van-icon-friends-o tab-bar-icon"></i>
+            <span>社区</span>
+        </a>
+        <a href="../个人中心模块/个人中心.html" class="tab-bar-item">
+            <i class="van-icon van-icon-user-o tab-bar-icon"></i>
+            <span>我的</span>
+        </a>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabItems = document.querySelectorAll('.data-tabs .tab-item');
+            
+            tabItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    tabItems.forEach(tab => tab.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 这里可以根据选中的标签更新数据显示
+                    // 例如从日视图切换到周视图等
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

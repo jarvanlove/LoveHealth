@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 食谱详情</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 80px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            height: 56px;
+            padding: 0 16px;
+            color: white;
+        }
+        .header-back {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .header-title {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .header-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-left: 8px;
+        }
+        .banner {
+            position: relative;
+            height: 240px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .banner-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .content {
+            position: relative;
+            margin-top: -40px;
+            border-radius: 24px 24px 0 0;
+            background-color: white;
+            padding: 20px 16px;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .recipe-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #323233;
+            margin-bottom: 12px;
+        }
+        .recipe-meta {
+            display: flex;
+            margin-bottom: 16px;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #646566;
+            margin-right: 16px;
+        }
+        .meta-icon {
+            margin-right: 6px;
+            font-size: 16px;
+            color: #1989fa;
+        }
+        .recipe-tags {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .recipe-tag {
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            background: #f2f3f5;
+            color: #323233;
+        }
+        .recipe-tag.featured {
+            background: rgba(25, 137, 250, 0.1);
+            color: #1989fa;
+        }
+        .nutrition-card {
+            background: #f7f8fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .nutrition-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            margin-bottom: 12px;
+        }
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .nutrition-item {
+            text-align: center;
+        }
+        .nutrition-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1989fa;
+            margin-bottom: 4px;
+        }
+        .nutrition-label {
+            font-size: 12px;
+            color: #969799;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+        .ingredients-list {
+            margin-bottom: 20px;
+        }
+        .ingredient-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .ingredient-name {
+            font-size: 14px;
+            color: #323233;
+        }
+        .ingredient-amount {
+            font-size: 14px;
+            color: #969799;
+        }
+        .steps-list {
+            margin-bottom: 20px;
+        }
+        .step-item {
+            display: flex;
+            margin-bottom: 16px;
+        }
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 14px;
+            background: #1989fa;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex: 1;
+        }
+        .step-text {
+            font-size: 14px;
+            color: #323233;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .step-image {
+            width: 100%;
+            height: 160px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .tips-card {
+            background: #f7f8fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .tips-content {
+            font-size: 14px;
+            color: #646566;
+            line-height: 1.5;
+        }
+        .action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            padding: 12px 16px;
+            background: white;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+            z-index: 99;
+        }
+        .action-favorite {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background: #f2f3f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: #ff9f66;
+            font-size: 24px;
+        }
+        .action-button {
+            flex: 1;
+            height: 48px;
+            border-radius: 24px;
+            background: #1989fa;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="header-back" onclick="window.history.back()">
+                <i class="van-icon van-icon-arrow-left"></i>
+            </div>
+            <div class="header-title"></div>
+            <div class="header-action">
+                <i class="van-icon van-icon-share-o"></i>
+            </div>
+            <div class="header-action">
+                <i class="van-icon van-icon-star-o"></i>
+            </div>
+        </div>
+        
+        <div class="banner">
+            <img class="banner-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450' width='800' height='450'%3E%3Crect width='800' height='450' style='fill:%23B0E0E6'/%3E%3Cellipse cx='400' cy='225' rx='250' ry='125' style='fill:%234682B4'/%3E%3C/svg%3E" alt="蔬菜鸡胸肉沙拉">
+        </div>
+        
+        <div class="content">
+            <h1 class="recipe-title">蔬菜鸡胸肉沙拉</h1>
+            
+            <div class="recipe-meta">
+                <div class="meta-item">
+                    <i class="van-icon van-icon-fire-o meta-icon"></i>
+                    <span>320千卡</span>
+                </div>
+                <div class="meta-item">
+                    <i class="van-icon van-icon-clock-o meta-icon"></i>
+                    <span>15分钟</span>
+                </div>
+                <div class="meta-item">
+                    <i class="van-icon van-icon-user-o meta-icon"></i>
+                    <span>2人份</span>
+                </div>
+            </div>
+            
+            <div class="recipe-tags">
+                <div class="recipe-tag featured">高蛋白</div>
+                <div class="recipe-tag featured">低脂肪</div>
+                <div class="recipe-tag">简单</div>
+                <div class="recipe-tag">减脂</div>
+                <div class="recipe-tag">午餐</div>
+            </div>
+            
+            <div class="nutrition-card">
+                <div class="nutrition-title">营养信息 (每份)</div>
+                <div class="nutrition-grid">
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">320</div>
+                        <div class="nutrition-label">千卡</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">29g</div>
+                        <div class="nutrition-label">蛋白质</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">12g</div>
+                        <div class="nutrition-label">脂肪</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">22g</div>
+                        <div class="nutrition-label">碳水</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">食材 (2人份)</div>
+            <div class="ingredients-list">
+                <div class="ingredient-item">
+                    <div class="ingredient-name">鸡胸肉</div>
+                    <div class="ingredient-amount">200克</div>
+                </div>
+                <div class="ingredient-item">
+                    <div class="ingredient-name">生菜</div>
+                    <div class="ingredient-amount">100克</div>
+                </div>
+                <div class="ingredient-item">
+                    <div class="ingredient-name">西红柿</div>
+                    <div class="ingredient-amount">1个</div>
+                </div>
+                <div class="ingredient-item">
+                    <div class="ingredient-name">黄瓜</div>
+                    <div class="ingredient-amount">1/2根</div>
+                </div>
+                <div class="ingredient-item">
+                    <div class="ingredient-name">红洋葱</div>
+                    <div class="ingredient-amount">1/4个</div>
+                </div>
+                <div class="ingredient-item">
+                    <div class="ingredient-name">牛油果</div>
+                    <div class="ingredient-amount">1/2个</div>
+                </div>
+                <div class="ingredient-item">
+                    <div class="ingredient-name">橄榄油</div>
+                    <div class="ingredient-amount">1汤匙</div>
+                </div>
+                <div class="ingredient-item">
+                    <div class="ingredient-name">柠檬汁</div>
+                    <div class="ingredient-amount">1汤匙</div>
+                </div>
+                <div class="ingredient-item">
+                    <div class="ingredient-name">盐和胡椒</div>
+                    <div class="ingredient-amount">适量</div>
+                </div>
+            </div>
+            
+            <div class="section-title">做法步骤</div>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-text">将鸡胸肉洗净，用厨房纸吸干水分，加入适量盐和胡椒腌制10分钟。</div>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-text">中火加热平底锅，放入少量橄榄油，将鸡胸肉放入煎至两面金黄（每面约4-5分钟），确保鸡肉完全熟透。</div>
+                        <img class="step-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450' width='800' height='450'%3E%3Crect width='800' height='450' style='fill:%23FFA07A'/%3E%3Cellipse cx='400' cy='225' rx='200' ry='100' style='fill:%23CD5C5C'/%3E%3C/svg%3E" alt="煎鸡胸肉">
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-text">将鸡胸肉从锅中取出，让其冷却后切成薄片或小块。</div>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-text">将生菜洗净撕成小块，西红柿切块，黄瓜切片，红洋葱切丝，牛油果切块。</div>
+                        <img class="step-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450' width='800' height='450'%3E%3Crect width='800' height='450' style='fill:%23F0FFF0'/%3E%3Cellipse cx='400' cy='225' rx='220' ry='110' style='fill:%2390EE90'/%3E%3C/svg%3E" alt="切好的蔬菜">
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-text">在大碗中混合所有蔬菜，加入切好的鸡胸肉。</div>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <div class="step-text">将橄榄油、柠檬汁、盐和胡椒混合制成简单的沙拉酱，淋在沙拉上。</div>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">7</div>
+                    <div class="step-content">
+                        <div class="step-text">轻轻拌匀所有材料，确保每一部分都均匀裹上沙拉酱。</div>
+                        <img class="step-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450' width='800' height='450'%3E%3Crect width='800' height='450' style='fill:%23FAFAD2'/%3E%3Cellipse cx='400' cy='225' rx='230' ry='115' style='fill:%23E0EEE0'/%3E%3C/svg%3E" alt="拌好的沙拉">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">小贴士</div>
+            <div class="tips-card">
+                <div class="tips-content">
+                    <p>• 可以根据个人口味添加其他蔬菜，如甜椒、玉米粒等。</p>
+                    <p>• 提前准备鸡胸肉可以节省时间，冷藏的熟鸡胸肉可以保存2-3天。</p>
+                    <p>• 如果喜欢更浓郁的味道，可以在沙拉酱中加入少量蜂蜜和第戎芥末。</p>
+                    <p>• 为增加蛋白质，可以加入少量切碎的煮鸡蛋或奶酪。</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-bar">
+            <div class="action-favorite">
+                <i class="van-icon van-icon-like-o"></i>
+            </div>
+            <div class="action-button">
+                添加到我的食谱
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 收藏按钮
+            const favoriteButton = document.querySelector('.action-favorite');
+            favoriteButton.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('van-icon-like-o')) {
+                    icon.classList.remove('van-icon-like-o');
+                    icon.classList.add('van-icon-like');
+                    alert('已收藏此食谱');
+                } else {
+                    icon.classList.remove('van-icon-like');
+                    icon.classList.add('van-icon-like-o');
+                    alert('已取消收藏');
+                }
+            });
+            
+            // 添加按钮
+            document.querySelector('.action-button').addEventListener('click', function() {
+                alert('已添加到我的食谱');
+            });
+            
+            // 分享按钮
+            document.querySelector('.van-icon-share-o').parentElement.addEventListener('click', function() {
+                alert('分享此食谱');
+            });
+            
+            // 收藏标记按钮
+            document.querySelector('.van-icon-star-o').parentElement.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('van-icon-star-o')) {
+                    icon.classList.remove('van-icon-star-o');
+                    icon.classList.add('van-icon-star');
+                    alert('已标记为喜爱食谱');
+                } else {
+                    icon.classList.remove('van-icon-star');
+                    icon.classList.add('van-icon-star-o');
+                    alert('已取消标记');
+                }
+            });
+            
+            // 点击食材
+            const ingredientItems = document.querySelectorAll('.ingredient-item');
+            ingredientItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const name = this.querySelector('.ingredient-name').textContent;
+                    alert(`查看${name}的营养信息`);
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

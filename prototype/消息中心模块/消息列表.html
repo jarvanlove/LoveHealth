@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 消息中心</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 60px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, #1989fa, #39a9ed);
+            color: white;
+            display: flex;
+            align-items: center;
+            height: 56px;
+            padding: 0 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+        }
+        .content {
+            padding-top: 56px;
+        }
+        .tabs-container {
+            position: sticky;
+            top: 56px;
+            background: white;
+            z-index: 99;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #f2f3f5;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 14px;
+            color: #646566;
+            position: relative;
+        }
+        .tab.active {
+            color: #1989fa;
+            font-weight: 500;
+        }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: #1989fa;
+            border-radius: 3px;
+        }
+        .message-list {
+            padding: 12px 0;
+        }
+        .message-item {
+            display: flex;
+            padding: 12px 16px;
+            background: white;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .message-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            overflow: hidden;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .message-avatar.system {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(25, 137, 250, 0.1);
+            color: #1989fa;
+            font-size: 22px;
+        }
+        .message-avatar.notification {
+            background: rgba(238, 10, 36, 0.1);
+            color: #ee0a24;
+        }
+        .message-avatar.comment {
+            background: rgba(255, 159, 102, 0.1);
+            color: #ff9f66;
+        }
+        .message-content {
+            flex: 1;
+            overflow: hidden;
+        }
+        .message-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .message-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #323233;
+        }
+        .message-time {
+            font-size: 12px;
+            color: #969799;
+        }
+        .message-text {
+            font-size: 14px;
+            color: #646566;
+            line-height: 1.5;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .message-footer {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #969799;
+        }
+        .message-count {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+        }
+        .message-count-icon {
+            font-size: 14px;
+            margin-right: 2px;
+        }
+        .message-status {
+            margin-left: auto;
+        }
+        .message-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%);
+            min-width: 16px;
+            height: 16px;
+            line-height: 16px;
+            padding: 0 4px;
+            border-radius: 8px;
+            background-color: #ee0a24;
+            color: white;
+            font-size: 12px;
+            text-align: center;
+        }
+        .message-item.unread .message-title {
+            color: #323233;
+            font-weight: bold;
+        }
+        .message-item.unread::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background: #ee0a24;
+            top: 12px;
+            left: 8px;
+        }
+        .empty-state {
+            padding: 40px 16px;
+            text-align: center;
+        }
+        .empty-icon {
+            font-size: 48px;
+            color: #dcdee0;
+            margin-bottom: 16px;
+        }
+        .empty-text {
+            font-size: 14px;
+            color: #969799;
+        }
+        .empty-button {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 8px 24px;
+            background: #1989fa;
+            color: white;
+            border-radius: 16px;
+            font-size: 14px;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            display: flex;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+            z-index: 99;
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #646566;
+            font-size: 12px;
+        }
+        .nav-item.active {
+            color: #1989fa;
+        }
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="header-title">消息中心</div>
+        </div>
+        
+        <div class="content">
+            <div class="tabs-container">
+                <div class="tabs">
+                    <div class="tab active">全部</div>
+                    <div class="tab">系统通知</div>
+                    <div class="tab">互动消息</div>
+                    <div class="tab">活动提醒</div>
+                </div>
+            </div>
+            
+            <div class="message-list">
+                <div class="message-item unread">
+                    <div class="message-avatar system">
+                        <i class="van-icon van-icon-volume-o"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <div class="message-title">系统通知</div>
+                            <div class="message-time">1小时前</div>
+                        </div>
+                        <div class="message-text">亲爱的用户，您的健康检测报告已生成，点击查看详细内容。我们发现一些指标需要您特别关注，请及时查看并根据建议进行调整。</div>
+                        <div class="message-footer">
+                            <div class="message-status">点击查看</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-item">
+                    <div class="message-avatar notification">
+                        <i class="van-icon van-icon-fire-o"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <div class="message-title">饮食提醒</div>
+                            <div class="message-time">4小时前</div>
+                        </div>
+                        <div class="message-text">今日还未记录午餐，请点击添加饮食记录，养成良好的饮食习惯，有助于更好地追踪和管理您的健康状况。</div>
+                        <div class="message-footer">
+                            <div class="message-status">立即记录</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-item">
+                    <div class="message-avatar comment">
+                        <i class="van-icon van-icon-comment-o"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <div class="message-title">互动消息</div>
+                            <div class="message-time">昨天 14:23</div>
+                        </div>
+                        <div class="message-text">张教练回复了您的健身计划咨询：「建议您先从有氧运动开始，每周3-4次，每次30分钟。同时配合一些简单的力量训练，逐步增加强度。」</div>
+                        <div class="message-footer">
+                            <div class="message-count">
+                                <i class="van-icon van-icon-eye-o message-count-icon"></i>
+                                <span>128</span>
+                            </div>
+                            <div class="message-count">
+                                <i class="van-icon van-icon-comment-o message-count-icon"></i>
+                                <span>32</span>
+                            </div>
+                            <div class="message-status">已回复</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-item">
+                    <div class="message-avatar">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120' width='120' height='120'%3E%3Crect width='120' height='120' style='fill:%23f2f3f5'/%3E%3Ccircle cx='60' cy='50' r='25' style='fill:%23e1e1e1'/%3E%3Ccircle cx='60' cy='120' r='50' style='fill:%23e1e1e1'/%3E%3C/svg%3E" alt="用户头像">
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <div class="message-title">营养师王小明</div>
+                            <div class="message-time">前天 09:45</div>
+                        </div>
+                        <div class="message-text">感谢您参与我们的「健康饮食21天挑战」活动，您的坚持令人印象深刻！我为您准备了一份个性化的膳食建议，希望对您有所帮助。</div>
+                        <div class="message-footer">
+                            <div class="message-status">查看详情</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-item">
+                    <div class="message-avatar system">
+                        <i class="van-icon van-icon-gift-o"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <div class="message-title">活动通知</div>
+                            <div class="message-time">3天前</div>
+                        </div>
+                        <div class="message-text">恭喜您获得「连续打卡7天」奖励，已为您发放50健康币，可在商城兑换精美礼品或健康服务。</div>
+                        <div class="message-footer">
+                            <div class="message-status">去使用</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-item">
+                    <div class="message-avatar notification">
+                        <i class="van-icon van-icon-clock-o"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <div class="message-title">睡眠提醒</div>
+                            <div class="message-time">4天前</div>
+                        </div>
+                        <div class="message-text">根据您的睡眠记录，您本周的平均睡眠时间为6.5小时，低于健康标准。建议您调整作息，保证每天7-8小时的睡眠时间。</div>
+                        <div class="message-footer">
+                            <div class="message-status">查看报告</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-home-o"></i>
+                </div>
+                <div>首页</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-friends-o"></i>
+                </div>
+                <div>社区</div>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-chat-o"></i>
+                    <div class="message-badge">6</div>
+                </div>
+                <div>消息</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="van-icon van-icon-manager-o"></i>
+                </div>
+                <div>我的</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 切换标签页
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 显示空状态（仅作为演示）
+                    const messageList = document.querySelector('.message-list');
+                    if (this.textContent === '活动提醒') {
+                        messageList.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="van-icon van-icon-whistle-o"></i>
+                                </div>
+                                <div class="empty-text">暂无活动提醒</div>
+                                <div class="empty-button">
+                                    发现活动
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // 此处应有实际的消息加载逻辑
+                        alert(`切换到${this.textContent}标签`);
+                    }
+                });
+            });
+            
+            // 点击消息项
+            const messageItems = document.querySelectorAll('.message-item');
+            messageItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const title = this.querySelector('.message-title').textContent;
+                    if (this.classList.contains('unread')) {
+                        this.classList.remove('unread');
+                        
+                        // 减少未读消息数量
+                        const badge = document.querySelector('.message-badge');
+                        const count = parseInt(badge.textContent);
+                        badge.textContent = count - 1;
+                        if (count - 1 === 0) {
+                            badge.style.display = 'none';
+                        }
+                    }
+                    alert(`查看${title}详情`);
+                });
+            });
+            
+            // 底部导航切换
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    if (!item.classList.contains('active')) {
+                        const pages = ['首页', '社区', '消息', '我的'];
+                        alert(`导航到${pages[index]}页面`);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

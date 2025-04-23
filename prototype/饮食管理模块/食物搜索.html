@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 食物搜索</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vant/icons/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            background-color: #f7f8fa;
+            color: #323233;
+            min-height: 100vh;
+        }
+        .app-container {
+            padding-bottom: 60px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background-color: #fff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+        .search-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+        }
+        .header-back {
+            font-size: 20px;
+            padding: 4px 8px 4px 0;
+            color: #323233;
+        }
+        .search-bar {
+            flex: 1;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            height: 36px;
+            padding: 8px 12px 8px 36px;
+            background: #f7f8fa;
+            border-radius: 18px;
+            border: none;
+            font-size: 14px;
+            color: #323233;
+        }
+        .search-input:focus {
+            outline: none;
+            background: #f2f3f5;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 10px;
+            color: #969799;
+            font-size: 16px;
+        }
+        .search-cancel {
+            padding-left: 12px;
+            font-size: 14px;
+            color: #1989fa;
+            white-space: nowrap;
+        }
+        .tabs-container {
+            background: white;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            position: fixed;
+            top: 52px;
+            left: 0;
+            right: 0;
+            z-index: 99;
+        }
+        .tabs {
+            display: flex;
+            padding: 0 16px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .tab {
+            position: relative;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #646566;
+        }
+        .tab.active {
+            color: #1989fa;
+            font-weight: 500;
+        }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: #1989fa;
+            border-radius: 3px;
+        }
+        .content {
+            margin-top: 104px;
+            padding: 16px;
+        }
+        .recent-searches {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #323233;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .clear-history {
+            font-size: 12px;
+            color: #969799;
+            font-weight: normal;
+        }
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .tag {
+            padding: 6px 12px;
+            background: #fff;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #323233;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .popular-foods {
+            margin-bottom: 20px;
+        }
+        .food-categories {
+            margin-bottom: 20px;
+        }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            border-radius: 8px;
+            padding: 12px 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: rgba(25, 137, 250, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+            color: #1989fa;
+            font-size: 20px;
+        }
+        .fruit-icon {
+            background: rgba(255, 159, 102, 0.1);
+            color: #FF9F66;
+        }
+        .veg-icon {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+        .meat-icon {
+            background: rgba(233, 30, 99, 0.1);
+            color: #E91E63;
+        }
+        .seafood-icon {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+        }
+        .grain-icon {
+            background: rgba(255, 193, 7, 0.1);
+            color: #FFC107;
+        }
+        .dairy-icon {
+            background: rgba(156, 39, 176, 0.1);
+            color: #9C27B0;
+        }
+        .nuts-icon {
+            background: rgba(121, 85, 72, 0.1);
+            color: #795548;
+        }
+        .condiment-icon {
+            background: rgba(244, 67, 54, 0.1);
+            color: #F44336;
+        }
+        .category-name {
+            font-size: 12px;
+            color: #323233;
+            text-align: center;
+        }
+        .search-results {
+            display: none;
+        }
+        .result-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .result-item {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .result-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-right: 12px;
+        }
+        .result-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .result-info {
+            flex: 1;
+        }
+        .result-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+        .result-details {
+            font-size: 12px;
+            color: #969799;
+            margin-bottom: 4px;
+        }
+        .result-calories {
+            font-size: 12px;
+            color: #FF9F66;
+            font-weight: 500;
+        }
+        .add-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #1989fa;
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+        }
+        .empty-result {
+            padding: 60px 0;
+            text-align: center;
+        }
+        .empty-icon {
+            font-size: 48px;
+            color: #c8c9cc;
+            margin-bottom: 12px;
+        }
+        .empty-text {
+            font-size: 14px;
+            color: #969799;
+        }
+        .scanner-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            margin-left: 12px;
+            color: #323233;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="search-header">
+                <i class="van-icon van-icon-arrow-left header-back" onclick="window.history.back()"></i>
+                <div class="search-bar">
+                    <i class="van-icon van-icon-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="搜索食物、菜品..." id="searchInput">
+                </div>
+                <div class="search-cancel" id="searchCancel">取消</div>
+                <div class="scanner-button">
+                    <i class="van-icon van-icon-scan"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tabs-container">
+            <div class="tabs">
+                <div class="tab active">全部</div>
+                <div class="tab">主食</div>
+                <div class="tab">肉类</div>
+                <div class="tab">蔬菜</div>
+                <div class="tab">水果</div>
+                <div class="tab">乳制品</div>
+                <div class="tab">零食</div>
+                <div class="tab">饮料</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- 搜索前展示内容 -->
+            <div class="search-home">
+                <div class="recent-searches">
+                    <div class="section-title">
+                        最近搜索
+                        <span class="clear-history">清空</span>
+                    </div>
+                    <div class="tags">
+                        <div class="tag">鸡胸肉</div>
+                        <div class="tag">燕麦片</div>
+                        <div class="tag">香蕉</div>
+                        <div class="tag">牛奶</div>
+                        <div class="tag">全麦面包</div>
+                    </div>
+                </div>
+                
+                <div class="popular-foods">
+                    <div class="section-title">热门食物</div>
+                    <div class="tags">
+                        <div class="tag">鸡蛋</div>
+                        <div class="tag">西兰花</div>
+                        <div class="tag">牛油果</div>
+                        <div class="tag">鲑鱼</div>
+                        <div class="tag">藜麦</div>
+                        <div class="tag">希腊酸奶</div>
+                        <div class="tag">红薯</div>
+                        <div class="tag">杏仁</div>
+                    </div>
+                </div>
+                
+                <div class="food-categories">
+                    <div class="section-title">食物分类</div>
+                    <div class="category-grid">
+                        <div class="category-item">
+                            <div class="category-icon fruit-icon">
+                                <i class="van-icon van-icon-fruit-o"></i>
+                            </div>
+                            <div class="category-name">水果</div>
+                        </div>
+                        <div class="category-item">
+                            <div class="category-icon veg-icon">
+                                <i class="van-icon van-icon-flower-o"></i>
+                            </div>
+                            <div class="category-name">蔬菜</div>
+                        </div>
+                        <div class="category-item">
+                            <div class="category-icon meat-icon">
+                                <i class="van-icon van-icon-coupon-o"></i>
+                            </div>
+                            <div class="category-name">肉类</div>
+                        </div>
+                        <div class="category-item">
+                            <div class="category-icon seafood-icon">
+                                <i class="van-icon van-icon-surf"></i>
+                            </div>
+                            <div class="category-name">海鲜</div>
+                        </div>
+                        <div class="category-item">
+                            <div class="category-icon grain-icon">
+                                <i class="van-icon van-icon-shop-o"></i>
+                            </div>
+                            <div class="category-name">谷物</div>
+                        </div>
+                        <div class="category-item">
+                            <div class="category-icon dairy-icon">
+                                <i class="van-icon van-icon-gift-o"></i>
+                            </div>
+                            <div class="category-name">乳制品</div>
+                        </div>
+                        <div class="category-item">
+                            <div class="category-icon nuts-icon">
+                                <i class="van-icon van-icon-cluster-o"></i>
+                            </div>
+                            <div class="category-name">坚果</div>
+                        </div>
+                        <div class="category-item">
+                            <div class="category-icon condiment-icon">
+                                <i class="van-icon van-icon-fire-o"></i>
+                            </div>
+                            <div class="category-name">调味品</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 搜索后展示的结果 -->
+            <div class="search-results" id="searchResults">
+                <div class="result-list">
+                    <div class="result-item">
+                        <div class="result-icon">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' width='200' height='200'%3E%3Crect width='200' height='200' style='fill:%23FFA07A'/%3E%3C/svg%3E" alt="鸡胸肉">
+                        </div>
+                        <div class="result-info">
+                            <div class="result-name">鸡胸肉</div>
+                            <div class="result-details">高蛋白 | 低脂肪 | 100g</div>
+                            <div class="result-calories">165千卡</div>
+                        </div>
+                        <div class="add-button">
+                            <i class="van-icon van-icon-plus"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-icon">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' width='200' height='200'%3E%3Crect width='200' height='200' style='fill:%23F0E68C'/%3E%3C/svg%3E" alt="鸡肉卷">
+                        </div>
+                        <div class="result-info">
+                            <div class="result-name">鸡肉卷</div>
+                            <div class="result-details">快餐 | 含面饼 | 1份</div>
+                            <div class="result-calories">356千卡</div>
+                        </div>
+                        <div class="add-button">
+                            <i class="van-icon van-icon-plus"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-icon">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' width='200' height='200'%3E%3Crect width='200' height='200' style='fill:%23D2B48C'/%3E%3C/svg%3E" alt="鸡翅">
+                        </div>
+                        <div class="result-info">
+                            <div class="result-name">烤鸡翅</div>
+                            <div class="result-details">烧烤 | 中等脂肪 | 1对</div>
+                            <div class="result-calories">240千卡</div>
+                        </div>
+                        <div class="add-button">
+                            <i class="van-icon van-icon-plus"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-icon">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' width='200' height='200'%3E%3Crect width='200' height='200' style='fill:%23F5DEB3'/%3E%3C/svg%3E" alt="宫保鸡丁">
+                        </div>
+                        <div class="result-info">
+                            <div class="result-name">宫保鸡丁</div>
+                            <div class="result-details">中餐 | 中等脂肪 | 1份</div>
+                            <div class="result-calories">385千卡</div>
+                        </div>
+                        <div class="add-button">
+                            <i class="van-icon van-icon-plus"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-icon">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' width='200' height='200'%3E%3Crect width='200' height='200' style='fill:%23DEB887'/%3E%3C/svg%3E" alt="蒸鸡">
+                        </div>
+                        <div class="result-info">
+                            <div class="result-name">清蒸鸡胸</div>
+                            <div class="result-details">健康烹饪 | 低脂肪 | 100g</div>
+                            <div class="result-calories">148千卡</div>
+                        </div>
+                        <div class="add-button">
+                            <i class="van-icon van-icon-plus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 无搜索结果时显示 -->
+            <div class="empty-result" style="display: none;">
+                <div class="empty-icon">
+                    <i class="van-icon van-icon-search"></i>
+                </div>
+                <div class="empty-text">未找到相关食物，试试其他关键词</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            const searchHome = document.querySelector('.search-home');
+            const searchCancel = document.getElementById('searchCancel');
+            
+            // 输入搜索内容时显示结果
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                if (query) {
+                    searchHome.style.display = 'none';
+                    searchResults.style.display = 'block';
+                    document.querySelector('.empty-result').style.display = 'none';
+                    
+                    // 模拟搜索 "鸡" 相关的食物
+                    if (query === '鸡') {
+                        searchResults.style.display = 'block';
+                    } else {
+                        searchResults.style.display = 'none';
+                        document.querySelector('.empty-result').style.display = 'block';
+                    }
+                } else {
+                    searchHome.style.display = 'block';
+                    searchResults.style.display = 'none';
+                    document.querySelector('.empty-result').style.display = 'none';
+                }
+            });
+            
+            // 取消搜索
+            searchCancel.addEventListener('click', function() {
+                searchInput.value = '';
+                searchHome.style.display = 'block';
+                searchResults.style.display = 'none';
+                document.querySelector('.empty-result').style.display = 'none';
+            });
+            
+            // 模拟点击食物分类
+            const categoryItems = document.querySelectorAll('.category-item');
+            categoryItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const categoryName = this.querySelector('.category-name').textContent;
+                    alert(`已选择分类：${categoryName}`);
+                });
+            });
+            
+            // 模拟点击添加按钮
+            const addButtons = document.querySelectorAll('.add-button');
+            addButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const foodName = this.parentElement.querySelector('.result-name').textContent;
+                    alert(`已添加${foodName}到今日饮食记录`);
+                    e.stopPropagation();
+                });
+            });
+            
+            // 模拟点击搜索结果项
+            const resultItems = document.querySelectorAll('.result-item');
+            resultItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const foodName = this.querySelector('.result-name').textContent;
+                    window.location.href = '食物详情.html';
+                });
+            });
+            
+            // 模拟点击标签
+            const tags = document.querySelectorAll('.tag');
+            tags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    searchInput.value = this.textContent;
+                    const event = new Event('input');
+                    searchInput.dispatchEvent(event);
+                });
+            });
+            
+            // 清空历史
+            const clearHistory = document.querySelector('.clear-history');
+            clearHistory.addEventListener('click', function() {
+                const recentTags = document.querySelector('.recent-searches .tags');
+                recentTags.innerHTML = '';
+                alert('已清空搜索历史');
+            });
+            
+            // 点击扫描按钮
+            const scannerButton = document.querySelector('.scanner-button');
+            scannerButton.addEventListener('click', function() {
+                alert('打开条形码扫描器');
+            });
+        });
+    </script>
+</body>
+</html> 

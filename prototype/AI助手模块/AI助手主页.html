@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI健康助手 - 爱健康</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333333;
+            line-height: 1.5;
+        }
+        .page-container {
+            padding-bottom: 50px;
+            position: relative;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #fff;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333333;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        .header-icon {
+            font-size: 24px;
+            color: #666666;
+            margin-left: 16px;
+        }
+        .ai-container {
+            padding: 80px 16px 80px;
+            min-height: calc(100vh - 50px);
+        }
+        .ai-assistant-card {
+            background: linear-gradient(135deg, #FF4B4B, #FF7676);
+            border-radius: 16px;
+            padding: 20px;
+            color: #fff;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .assistant-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .assistant-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            margin-right: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .assistant-avatar img {
+            width: 38px;
+            height: 38px;
+        }
+        .assistant-details {
+            flex: 1;
+        }
+        .assistant-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .assistant-subtitle {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        .assistant-status {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #4caf50;
+            margin-right: 4px;
+        }
+        .assistant-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .action-button {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+        }
+        .action-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .bubble-decoration {
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .feature-section {
+            background-color: #fff;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .section-more {
+            font-size: 12px;
+            color: #999999;
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+        }
+        .section-content {
+            padding: 16px;
+        }
+        .health-service-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .health-service-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #FFF0F0;
+            border-radius: 10px;
+            padding: 16px 10px;
+            text-align: center;
+        }
+        .service-icon {
+            font-size: 24px;
+            color: #FF4B4B;
+            margin-bottom: 8px;
+        }
+        .service-name {
+            font-size: 12px;
+            color: #333333;
+            font-weight: 500;
+        }
+        .health-reports {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 8px;
+        }
+        .report-card {
+            flex: 0 0 140px;
+            background-color: #FFF0F0;
+            border-radius: 10px;
+            padding: 12px;
+            position: relative;
+        }
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .report-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            background-color: #FF4B4B;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 18px;
+        }
+        .report-actions {
+            display: flex;
+            align-items: center;
+        }
+        .report-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 4px;
+        }
+        .report-date {
+            font-size: 11px;
+            color: #999999;
+            margin-bottom: 12px;
+        }
+        .report-score {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .score-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #FF4B4B;
+        }
+        .score-max {
+            font-size: 12px;
+            color: #999999;
+        }
+        .record-shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .record-shortcut-item {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #EEEEEE;
+            border-radius: 10px;
+            padding: 12px;
+        }
+        .record-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #FFF0F0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 12px;
+            color: #FF4B4B;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .record-details {
+            flex: 1;
+        }
+        .record-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 2px;
+        }
+        .record-desc {
+            font-size: 11px;
+            color: #999999;
+        }
+        .quick-question-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .quick-question-item {
+            background-color: #FFF0F0;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #FF4B4B;
+            text-align: center;
+        }
+        .chat-footer {
+            position: fixed;
+            bottom: 50px;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .chat-input {
+            flex: 1;
+            height: 40px;
+            background-color: #f5f5f5;
+            border-radius: 20px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            color: #999999;
+        }
+        .voice-input-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #FF4B4B;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            margin-left: 12px;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            height: 50px;
+            background-color: #fff;
+            box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #666666;
+            font-size: 10px;
+        }
+        .nav-item.active {
+            color: #FF4B4B;
+        }
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="page-container">
+            <div class="header">
+                <div class="page-title">AI健康助手</div>
+                <div class="header-actions">
+                    <van-icon name="search" class="header-icon" @click="showSearch" />
+                    <van-icon name="bar-chart-o" class="header-icon" @click="showAnalytics" />
+                </div>
+            </div>
+            
+            <div class="ai-container">
+                <div class="ai-assistant-card">
+                    <div class="bubble-decoration"></div>
+                    
+                    <div class="assistant-info">
+                        <div class="assistant-avatar">
+                            <img src="https://img.yzcdn.cn/vant/cat.jpeg" alt="AI助手" />
+                        </div>
+                        <div class="assistant-details">
+                            <div class="assistant-name">健康小智</div>
+                            <div class="assistant-subtitle">您的专属健康顾问</div>
+                        </div>
+                        <div class="assistant-status">
+                            <span class="status-dot"></span>
+                            在线
+                        </div>
+                    </div>
+                    
+                    <div class="assistant-actions">
+                        <div class="action-button" @click="startVoiceChat">
+                            <van-icon name="phone-o" class="action-icon" />
+                            <span>语音对话</span>
+                        </div>
+                        <div class="action-button" @click="startTextChat">
+                            <van-icon name="chat-o" class="action-icon" />
+                            <span>文字咨询</span>
+                        </div>
+                        <div class="action-button" @click="scanFood">
+                            <van-icon name="photograph" class="action-icon" />
+                            <span>食物识别</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-section">
+                    <div class="section-header">
+                        健康服务
+                        <div class="section-more" @click="showAllServices">
+                            更多
+                            <van-icon name="arrow" style="margin-left: 2px;" />
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="health-service-grid">
+                            <div class="health-service-item" v-for="(service, index) in healthServices" :key="index" @click="useService(service)">
+                                <van-icon :name="service.icon" class="service-icon" />
+                                <div class="service-name">{{ service.name }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-section">
+                    <div class="section-header">
+                        健康报告
+                        <div class="section-more" @click="viewAllReports">
+                            查看全部
+                            <van-icon name="arrow" style="margin-left: 2px;" />
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="health-reports">
+                            <div class="report-card" v-for="(report, index) in healthReports" :key="index" @click="viewReport(report)">
+                                <div class="report-header">
+                                    <div class="report-icon">
+                                        <van-icon :name="report.icon" />
+                                    </div>
+                                    <div class="report-actions">
+                                        <van-icon name="more-o" />
+                                    </div>
+                                </div>
+                                <div class="report-title">{{ report.title }}</div>
+                                <div class="report-date">{{ report.date }}</div>
+                                <div class="report-score">
+                                    <div class="score-value">{{ report.score }}</div>
+                                    <div class="score-max">满分100</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-section">
+                    <div class="section-header">
+                        快速记录
+                    </div>
+                    <div class="section-content">
+                        <div class="record-shortcut-grid">
+                            <div class="record-shortcut-item" v-for="(record, index) in recordShortcuts" :key="index" @click="addRecord(record)">
+                                <div class="record-icon">
+                                    <van-icon :name="record.icon" />
+                                </div>
+                                <div class="record-details">
+                                    <div class="record-name">{{ record.name }}</div>
+                                    <div class="record-desc">{{ record.description }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-section">
+                    <div class="section-header">
+                        常见问题
+                    </div>
+                    <div class="section-content">
+                        <div class="quick-question-grid">
+                            <div class="quick-question-item" v-for="(question, index) in quickQuestions" :key="index" @click="askQuestion(question)">
+                                {{ question }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-footer">
+                <div class="chat-input" @click="showChatInput">
+                    <span>输入问题或健康咨询...</span>
+                </div>
+                <div class="voice-input-button" @click="startVoiceInput">
+                    <van-icon name="mic" />
+                </div>
+            </div>
+            
+            <div class="bottom-nav">
+                <div class="nav-item">
+                    <van-icon name="home-o" class="nav-icon" />
+                    <span>首页</span>
+                </div>
+                <div class="nav-item">
+                    <van-icon name="fire-o" class="nav-icon" />
+                    <span>食谱</span>
+                </div>
+                <div class="nav-item">
+                    <van-icon name="friends-o" class="nav-icon" />
+                    <span>社区</span>
+                </div>
+                <div class="nav-item active">
+                    <van-icon name="service" class="nav-icon" />
+                    <span>AI助手</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp, ref, reactive } = Vue;
+        
+        createApp({
+            setup() {
+                const healthServices = ref([
+                    { icon: 'notes-o', name: '饮食建议' },
+                    { icon: 'guide-o', name: '运动指导' },
+                    { icon: 'clock-o', name: '睡眠分析' },
+                    { icon: 'star-o', name: '情绪调节' },
+                    { icon: 'balance-o', name: '营养评估' },
+                    { icon: 'bookmark-o', name: '症状查询' }
+                ]);
+                
+                const healthReports = ref([
+                    { 
+                        icon: 'balance-list-o', 
+                        title: '营养健康评估', 
+                        date: '2023-06-08',
+                        score: 85,
+                        id: 1
+                    },
+                    { 
+                        icon: 'guide-o', 
+                        title: '运动健康状况', 
+                        date: '2023-06-05',
+                        score: 78,
+                        id: 2
+                    },
+                    { 
+                        icon: 'wap-home', 
+                        title: '睡眠质量分析', 
+                        date: '2023-06-01',
+                        score: 92,
+                        id: 3
+                    }
+                ]);
+                
+                const recordShortcuts = ref([
+                    {
+                        icon: 'balance-list-o',
+                        name: '饮食记录',
+                        description: '记录一日三餐和零食',
+                        type: 'diet'
+                    },
+                    {
+                        icon: 'guide-o',
+                        name: '运动记录',
+                        description: '记录运动类型和时长',
+                        type: 'exercise'
+                    },
+                    {
+                        icon: 'clock-o',
+                        name: '睡眠记录',
+                        description: '记录睡眠时间和质量',
+                        type: 'sleep'
+                    },
+                    {
+                        icon: 'smile-o',
+                        name: '情绪记录',
+                        description: '记录当天情绪状态',
+                        type: 'mood'
+                    }
+                ]);
+                
+                const quickQuestions = ref([
+                    '如何提高睡眠质量？',
+                    '健康饮食搭配建议',
+                    '运动后肌肉酸痛怎么办？',
+                    '如何科学减肥？',
+                    '工作压力大怎么调节？',
+                    '理想体重应该是多少？'
+                ]);
+                
+                const showSearch = () => {
+                    vant.showToast('打开搜索');
+                };
+                
+                const showAnalytics = () => {
+                    vant.showToast('查看健康数据分析');
+                };
+                
+                const startVoiceChat = () => {
+                    vant.showToast('开始语音对话');
+                };
+                
+                const startTextChat = () => {
+                    vant.showToast('开始文字咨询');
+                };
+                
+                const scanFood = () => {
+                    vant.showToast('启动食物识别');
+                };
+                
+                const showAllServices = () => {
+                    vant.showToast('查看所有健康服务');
+                };
+                
+                const useService = (service) => {
+                    vant.showToast(`使用服务: ${service.name}`);
+                };
+                
+                const viewAllReports = () => {
+                    vant.showToast('查看所有健康报告');
+                };
+                
+                const viewReport = (report) => {
+                    vant.showToast(`查看报告: ${report.title}`);
+                };
+                
+                const addRecord = (record) => {
+                    vant.showToast(`添加${record.name}`);
+                };
+                
+                const askQuestion = (question) => {
+                    vant.showToast(`提问: ${question}`);
+                };
+                
+                const showChatInput = () => {
+                    vant.showToast('打开对话输入框');
+                };
+                
+                const startVoiceInput = () => {
+                    vant.showToast('开始语音输入');
+                };
+                
+                return {
+                    healthServices,
+                    healthReports,
+                    recordShortcuts,
+                    quickQuestions,
+                    showSearch,
+                    showAnalytics,
+                    startVoiceChat,
+                    startTextChat,
+                    scanFood,
+                    showAllServices,
+                    useService,
+                    viewAllReports,
+                    viewReport,
+                    addRecord,
+                    askQuestion,
+                    showChatInput,
+                    startVoiceInput
+                };
+            }
+        }).use(vant).mount('#app');
+    </script>
+</body>
+</html> 

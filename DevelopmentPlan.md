@@ -27,27 +27,27 @@
 - [X] 配置跨域中间件
 
 #### Day 2：数据库设计
-- [X]1. users - 用户表
-- [X]2. user_profiles - 用户详情表
-- [X]3. recipes - 食谱表
-- [X]4. recipe_steps - 食谱步骤表
-- [X]5. recipe_ingredients - 食谱食材关联表
-- [X]6. ingredients - 食材表
-- [X]7. ingredient_categories - 食材分类表
-- [X]8. ingredient_nutrition - 食材营养成分表
-- [X]9. posts - 社区帖子表
-- [X]10. comments - 评论表
-- [X]11. likes - 点赞表
-- [X]12. collections - 收藏表
-- [X]13. user_follows - 用户关注表
-- [X]14. messages - 消息表
-- [X]15. ai_chat_records - AI对话记录表
-- [X]16. user_health_data - 用户健康数据表
-- [X]17. weight_records - 体重记录表
-- [X]18. daily_activities - 每日活动记录表
-- [X]19. meal_records - 饮食记录表
-- [X]20. health_metrics - 健康指标记录表
-- [X]21. health_goals - 健康目标表
+- [X] 1. users - 用户表
+- [X] 2. user_profiles - 用户详情表
+- [X] 3. recipes - 食谱表
+- [X] 4. recipe_steps - 食谱步骤表
+- [X] 5. recipe_ingredients - 食谱食材关联表
+- [X] 6. ingredients - 食材表
+- [X] 7. ingredient_categories - 食材分类表
+- [X] 8. ingredient_nutrition - 食材营养成分表
+- [X] 9. posts - 社区帖子表
+- [X] 10. comments - 评论表
+- [X] 11. likes - 点赞表
+- [X] 12. collections - 收藏表
+- [X] 13. user_follows - 用户关注表
+- [X] 14. messages - 消息表
+- [X] 15. ai_chat_records - AI对话记录表
+- [X] 16. user_health_data - 用户健康数据表
+- [X] 17. weight_records - 体重记录表
+- [X] 18. daily_activities - 每日活动记录表
+- [X] 19. meal_records - 饮食记录表
+- [X] 20. health_metrics - 健康指标记录表
+- [X] 21. health_goals - 健康目标表
 
 #### Day 3：工具类开发
 前端任务：
@@ -85,7 +85,6 @@
 前端任务：
 - [ ] 首页布局开发
 - [ ] 搜索组件开发
-- [ ] 轮播图组件
 - [ ] 分类导航组件
 - [ ] 推荐列表组件
 

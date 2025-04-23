@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食谱推荐 - 爱健康</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333333;
+            line-height: 1.5;
+        }
+        .page-container {
+            padding-bottom: 50px;
+        }
+        .search-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background-color: #fff;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .category-tabs {
+            position: sticky;
+            top: 54px;
+            z-index: 998;
+            background-color: #fff;
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+        .tabs-container {
+            display: flex;
+            padding: 0 8px;
+        }
+        .tab-item {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #666666;
+            position: relative;
+        }
+        .tab-item.active {
+            color: #FF4B4B;
+            font-weight: 500;
+        }
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 3px;
+            background-color: #FF4B4B;
+            border-radius: 2px;
+        }
+        .content {
+            padding: 112px 16px 0;
+        }
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .filter-button {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #666666;
+        }
+        .filter-icon {
+            margin-left: 2px;
+        }
+        .view-switch {
+            display: flex;
+            align-items: center;
+        }
+        .switch-icon {
+            font-size: 18px;
+            color: #999999;
+            margin-left: 8px;
+        }
+        .switch-icon.active {
+            color: #FF4B4B;
+        }
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .recipe-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+        .recipe-card:active {
+            transform: scale(0.98);
+        }
+        .recipe-cover {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 比例 */
+            overflow: hidden;
+        }
+        .recipe-cover img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .recipe-difficulty {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 2px 6px;
+            font-size: 10px;
+            color: #fff;
+            border-radius: 12px;
+        }
+        .difficulty-easy {
+            background-color: #4CAF50;
+        }
+        .difficulty-medium {
+            background-color: #FF9800;
+        }
+        .difficulty-hard {
+            background-color: #F44336;
+        }
+        .recipe-info {
+            padding: 10px;
+        }
+        .recipe-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 42px;
+        }
+        .recipe-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999999;
+        }
+        .recipe-author {
+            display: flex;
+            align-items: center;
+        }
+        .author-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+        .recipe-stats {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+        }
+        .stat-icon {
+            font-size: 12px;
+            margin-right: 2px;
+        }
+        .recipe-tags {
+            margin-top: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .recipe-tag {
+            padding: 2px 6px;
+            background-color: #f5f5f5;
+            color: #666666;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+        .recipe-tag.nutrition {
+            background-color: #FFEBEB;
+            color: #FF4B4B;
+        }
+        .recipe-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .recipe-list-item {
+            display: flex;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .list-item-cover {
+            width: 120px;
+            height: 90px;
+            flex-shrink: 0;
+        }
+        .list-item-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .list-item-info {
+            flex: 1;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .list-item-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .list-item-description {
+            font-size: 12px;
+            color: #666666;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        .list-item-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999999;
+        }
+        .list-item-tags {
+            display: flex;
+            gap: 6px;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            height: 50px;
+            background-color: #fff;
+            box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #666666;
+            font-size: 10px;
+        }
+        .nav-item.active {
+            color: #FF4B4B;
+        }
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .empty-icon {
+            font-size: 48px;
+            color: #dcdee0;
+            margin-bottom: 12px;
+        }
+        .empty-text {
+            font-size: 14px;
+            color: #969799;
+            margin-bottom: 16px;
+        }
+        .empty-button {
+            display: inline-block;
+            padding: 8px 24px;
+            background: linear-gradient(to right, #FF4B4B, #FF7676);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="page-container">
+            <div class="search-header">
+                <van-search
+                    v-model="searchValue"
+                    placeholder="搜索健康食谱、食材"
+                    shape="round"
+                    background="#ffffff"
+                    @click="goToSearch"
+                ></van-search>
+            </div>
+            
+            <div class="category-tabs">
+                <div class="tabs-container">
+                    <div 
+                        v-for="(category, index) in categories" 
+                        :key="index"
+                        class="tab-item"
+                        :class="{ active: activeCategory === index }"
+                        @click="activeCategory = index"
+                    >
+                        {{ category }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="filter-bar">
+                    <div class="filter-buttons">
+                        <div class="filter-button" @click="showDifficultyFilter">
+                            难度
+                            <van-icon name="arrow-down" class="filter-icon" />
+                        </div>
+                        <div class="filter-button" @click="showTimeFilter">
+                            时间
+                            <van-icon name="arrow-down" class="filter-icon" />
+                        </div>
+                        <div class="filter-button" @click="showSortFilter">
+                            排序
+                            <van-icon name="arrow-down" class="filter-icon" />
+                        </div>
+                    </div>
+                    <div class="view-switch">
+                        <van-icon 
+                            name="wap-nav" 
+                            class="switch-icon" 
+                            :class="{ active: viewMode === 'list' }"
+                            @click="viewMode = 'list'"
+                        />
+                        <van-icon 
+                            name="apps-o" 
+                            class="switch-icon" 
+                            :class="{ active: viewMode === 'grid' }"
+                            @click="viewMode = 'grid'"
+                        />
+                    </div>
+                </div>
+                
+                <div v-if="loading" style="text-align: center; padding: 30px 0;">
+                    <van-loading type="spinner" color="#FF4B4B" />
+                </div>
+                
+                <div v-else-if="recipes.length === 0" class="empty-state">
+                    <van-icon name="smile-comment-o" class="empty-icon" />
+                    <div class="empty-text">暂时没有找到食谱</div>
+                    <div class="empty-button" @click="resetFilters">清除筛选条件</div>
+                </div>
+                
+                <div v-else-if="viewMode === 'grid'" class="recipe-grid">
+                    <div 
+                        v-for="(recipe, index) in recipes" 
+                        :key="index"
+                        class="recipe-card"
+                        @click="viewRecipe(recipe.id)"
+                    >
+                        <div class="recipe-cover">
+                            <img :src="recipe.cover" :alt="recipe.title" />
+                            <div 
+                                class="recipe-difficulty"
+                                :class="{
+                                    'difficulty-easy': recipe.difficulty === '简单',
+                                    'difficulty-medium': recipe.difficulty === '中等',
+                                    'difficulty-hard': recipe.difficulty === '困难'
+                                }"
+                            >
+                                {{ recipe.difficulty }}
+                            </div>
+                        </div>
+                        <div class="recipe-info">
+                            <div class="recipe-title">{{ recipe.title }}</div>
+                            <div class="recipe-meta">
+                                <div class="recipe-author">
+                                    <img :src="recipe.authorAvatar" class="author-avatar" :alt="recipe.author" />
+                                    <span>{{ recipe.author }}</span>
+                                </div>
+                                <div class="recipe-stats">
+                                    <div class="stat-item">
+                                        <van-icon name="like-o" class="stat-icon" />
+                                        <span>{{ recipe.likes }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="recipe-tags">
+                                <span class="recipe-tag">{{ recipe.time }}分钟</span>
+                                <span class="recipe-tag nutrition" v-if="recipe.nutrition">{{ recipe.nutrition }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div v-else class="recipe-list">
+                    <div 
+                        v-for="(recipe, index) in recipes" 
+                        :key="index"
+                        class="recipe-list-item"
+                        @click="viewRecipe(recipe.id)"
+                    >
+                        <div class="list-item-cover">
+                            <img :src="recipe.cover" :alt="recipe.title" />
+                        </div>
+                        <div class="list-item-info">
+                            <div>
+                                <div class="list-item-title">{{ recipe.title }}</div>
+                                <div class="list-item-description">{{ recipe.description }}</div>
+                            </div>
+                            <div class="list-item-meta">
+                                <div class="list-item-tags">
+                                    <span class="recipe-tag">{{ recipe.difficulty }}</span>
+                                    <span class="recipe-tag">{{ recipe.time }}分钟</span>
+                                </div>
+                                <div class="recipe-author">
+                                    <img :src="recipe.authorAvatar" class="author-avatar" :alt="recipe.author" />
+                                    <span>{{ recipe.author }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bottom-nav">
+                <div class="nav-item">
+                    <van-icon name="home-o" class="nav-icon" />
+                    <span>首页</span>
+                </div>
+                <div class="nav-item active">
+                    <van-icon name="fire" class="nav-icon" />
+                    <span>食谱</span>
+                </div>
+                <div class="nav-item">
+                    <van-icon name="friends-o" class="nav-icon" />
+                    <span>社区</span>
+                </div>
+                <div class="nav-item">
+                    <van-icon name="manager-o" class="nav-icon" />
+                    <span>我的</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 难度筛选弹窗 -->
+        <van-popup
+            v-model:show="showDifficulty"
+            position="bottom"
+            round
+            :style="{ maxHeight: '40%' }"
+        >
+            <van-picker
+                title="选择难度"
+                :columns="difficultyOptions"
+                @confirm="confirmDifficulty"
+                @cancel="showDifficulty = false"
+                show-toolbar
+            />
+        </van-popup>
+        
+        <!-- 时间筛选弹窗 -->
+        <van-popup
+            v-model:show="showTime"
+            position="bottom"
+            round
+            :style="{ maxHeight: '40%' }"
+        >
+            <van-picker
+                title="烹饪时间"
+                :columns="timeOptions"
+                @confirm="confirmTime"
+                @cancel="showTime = false"
+                show-toolbar
+            />
+        </van-popup>
+        
+        <!-- 排序筛选弹窗 -->
+        <van-popup
+            v-model:show="showSort"
+            position="bottom"
+            round
+            :style="{ maxHeight: '40%' }"
+        >
+            <van-picker
+                title="排序方式"
+                :columns="sortOptions"
+                @confirm="confirmSort"
+                @cancel="showSort = false"
+                show-toolbar
+            />
+        </van-popup>
+    </div>
+    
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+        
+        createApp({
+            setup() {
+                const searchValue = ref('');
+                const activeCategory = ref(0);
+                const viewMode = ref('grid');
+                const loading = ref(true);
+                
+                const categories = ref(['全部', '营养', '健身', '减重', '产后恢复', '儿童']);
+                
+                const showDifficulty = ref(false);
+                const showTime = ref(false);
+                const showSort = ref(false);
+                
+                const difficultyOptions = ref(['全部难度', '简单', '中等', '困难']);
+                const timeOptions = ref(['全部时间', '15分钟以内', '15-30分钟', '30-60分钟', '60分钟以上']);
+                const sortOptions = ref(['最新发布', '最受欢迎', '最多收藏', '烹饪时间']);
+                
+                const selectedDifficulty = ref('全部难度');
+                const selectedTime = ref('全部时间');
+                const selectedSort = ref('最新发布');
+                
+                const recipes = ref([]);
+                
+                onMounted(() => {
+                    setTimeout(() => {
+                        loading.value = false;
+                        recipes.value = [
+                            {
+                                id: 1,
+                                title: '低脂鸡胸肉蔬菜沙拉：增肌减脂的理想选择',
+                                description: '这道沙拉富含蛋白质和纤维，热量低，非常适合健身减脂人群。鸡胸肉提供优质蛋白质，混合蔬菜提供丰富维生素。',
+                                cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                difficulty: '简单',
+                                time: 20,
+                                author: '健身厨房',
+                                authorAvatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                likes: 328,
+                                nutrition: '高蛋白'
+                            },
+                            {
+                                id: 2,
+                                title: '五谷杂粮糙米饭：提升免疫力的全营养主食',
+                                description: '糙米和五谷杂粮保留了谷物的完整营养，富含膳食纤维和B族维生素。这款主食能够稳定血糖，增强饱腹感。',
+                                cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                difficulty: '简单',
+                                time: 35,
+                                author: '营养师王小明',
+                                authorAvatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                likes: 156,
+                                nutrition: '纤维素'
+                            },
+                            {
+                                id: 3,
+                                title: '香煎三文鱼配芦笋：Omega-3脂肪酸的绝佳来源',
+                                description: '三文鱼富含优质Omega-3脂肪酸，有助于心脑血管健康。搭配芦笋等绿色蔬菜，营养均衡，口感鲜美。',
+                                cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                difficulty: '中等',
+                                time: 25,
+                                author: '美食达人李厨',
+                                authorAvatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                likes: 219,
+                                nutrition: 'Omega-3'
+                            },
+                            {
+                                id: 4,
+                                title: '蒸蛋羹配紫菜：儿童成长必备的优质蛋白',
+                                description: '嫩滑的蒸蛋富含优质蛋白质，紫菜提供碘和多种矿物质。这道简单的菜品特别适合3岁以上儿童食用。',
+                                cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                difficulty: '简单',
+                                time: 15,
+                                author: '儿童营养师',
+                                authorAvatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                likes: 187,
+                                nutrition: '儿童营养'
+                            },
+                            {
+                                id: 5,
+                                title: '红豆薏米粥：祛湿养颜的传统食疗',
+                                description: '红豆和薏米在中医理论中有很好的祛湿功效，长期食用有助于改善水肿和湿气重的问题。此粥做法简单，口感清甜。',
+                                cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                difficulty: '简单',
+                                time: 45,
+                                author: '中医食疗师',
+                                authorAvatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                likes: 276,
+                                nutrition: '祛湿养颜'
+                            },
+                            {
+                                id: 6,
+                                title: '黑椒牛排配烤蔬菜：增肌健身的完美餐',
+                                description: '牛排富含优质蛋白质和铁质，搭配多种烤蔬菜，既美味又营养均衡。黑椒酱汁提升了整体风味，是健身增肌人群的理想选择。',
+                                cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                difficulty: '困难',
+                                time: 40,
+                                author: '健身教练Mike',
+                                authorAvatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                likes: 342,
+                                nutrition: '增肌'
+                            }
+                        ];
+                    }, 1000);
+                });
+                
+                const goToSearch = () => {
+                    vant.showToast('前往搜索页');
+                };
+                
+                const viewRecipe = (id) => {
+                    vant.showToast(`查看食谱 ${id}`);
+                };
+                
+                const showDifficultyFilter = () => {
+                    showDifficulty.value = true;
+                };
+                
+                const showTimeFilter = () => {
+                    showTime.value = true;
+                };
+                
+                const showSortFilter = () => {
+                    showSort.value = true;
+                };
+                
+                const confirmDifficulty = ({ selectedValues }) => {
+                    selectedDifficulty.value = selectedValues[0];
+                    showDifficulty.value = false;
+                    applyFilters();
+                };
+                
+                const confirmTime = ({ selectedValues }) => {
+                    selectedTime.value = selectedValues[0];
+                    showTime.value = false;
+                    applyFilters();
+                };
+                
+                const confirmSort = ({ selectedValues }) => {
+                    selectedSort.value = selectedValues[0];
+                    showSort.value = false;
+                    applyFilters();
+                };
+                
+                const applyFilters = () => {
+                    loading.value = true;
+                    // 实际应用中这里会调用API进行筛选
+                    // 这里模拟过滤操作
+                    setTimeout(() => {
+                        loading.value = false;
+                        // 如果选择了困难难度，显示一个空结果示例
+                        if (selectedDifficulty.value === '困难' && selectedTime.value === '15分钟以内') {
+                            recipes.value = [];
+                        }
+                    }, 800);
+                };
+                
+                const resetFilters = () => {
+                    selectedDifficulty.value = '全部难度';
+                    selectedTime.value = '全部时间';
+                    selectedSort.value = '最新发布';
+                    loading.value = true;
+                    
+                    setTimeout(() => {
+                        loading.value = false;
+                        recipes.value = [
+                            {
+                                id: 1,
+                                title: '低脂鸡胸肉蔬菜沙拉：增肌减脂的理想选择',
+                                description: '这道沙拉富含蛋白质和纤维，热量低，非常适合健身减脂人群。鸡胸肉提供优质蛋白质，混合蔬菜提供丰富维生素。',
+                                cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                difficulty: '简单',
+                                time: 20,
+                                author: '健身厨房',
+                                authorAvatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
+                                likes: 328,
+                                nutrition: '高蛋白'
+                            },
+                            // ... 其他食谱数据
+                        ];
+                    }, 800);
+                };
+                
+                return {
+                    searchValue,
+                    activeCategory,
+                    categories,
+                    viewMode,
+                    recipes,
+                    loading,
+                    showDifficulty,
+                    showTime,
+                    showSort,
+                    difficultyOptions,
+                    timeOptions,
+                    sortOptions,
+                    selectedDifficulty,
+                    selectedTime,
+                    selectedSort,
+                    goToSearch,
+                    viewRecipe,
+                    showDifficultyFilter,
+                    showTimeFilter,
+                    showSortFilter,
+                    confirmDifficulty,
+                    confirmTime,
+                    confirmSort,
+                    resetFilters
+                };
+            }
+        }).use(vant).mount('#app');
+    </script>
+</body>
+</html> 

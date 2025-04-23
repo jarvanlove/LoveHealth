@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱健康 - 登录</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+            min-height: 100vh;
+            background: #f8f8f8;
+            display: flex;
+            flex-direction: column;
+        }
+        .login-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 24px;
+        }
+        .login-header {
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        .login-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        .login-subtitle {
+            font-size: 14px;
+            color: #999;
+        }
+        .login-form {
+            margin-bottom: 20px;
+        }
+        .form-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .form-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .form-input {
+            width: 100%;
+            height: 48px;
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
+            padding: 0 15px;
+            font-size: 15px;
+            background: #fff;
+            transition: all 0.3s;
+        }
+        .form-input:focus {
+            border-color: #FF4B4B;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 75, 75, 0.1);
+        }
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        .remember-checkbox {
+            margin-right: 6px;
+            width: 16px;
+            height: 16px;
+        }
+        .remember-text {
+            font-size: 14px;
+            color: #666;
+        }
+        .forgot-password {
+            font-size: 14px;
+            color: #FF4B4B;
+            text-decoration: none;
+        }
+        .login-button {
+            width: 100%;
+            height: 48px;
+            border-radius: 24px;
+            background: linear-gradient(90deg, #FF4B4B, #FF7676);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            box-shadow: 0 5px 15px rgba(255, 75, 75, 0.3);
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .register-now {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+        .register-link {
+            color: #FF4B4B;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .login-decoration {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50vh;
+            z-index: -1;
+            opacity: 0.05;
+            background: url('https://img.freepik.com/free-vector/hand-drawn-healthy-food-background_23-2148123294.jpg?w=1380&t=st=1687789986~exp=1687790586~hmac=cfc3d63f71f4233d1565fa40a23fcc69435dfd6ef7f73839b53cfc465ca09186') no-repeat center bottom;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1 class="login-title">欢迎回来</h1>
+            <p class="login-subtitle">登录爱健康，开启健康生活</p>
+        </div>
+        
+        <div class="login-form">
+            <div class="form-item">
+                <label class="form-label">用户名/手机号</label>
+                <input type="text" class="form-input" placeholder="请输入用户名或手机号">
+            </div>
+            
+            <div class="form-item">
+                <label class="form-label">密码</label>
+                <input type="password" class="form-input" placeholder="请输入密码">
+            </div>
+            
+            <div class="form-footer">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" class="remember-checkbox">
+                    <label for="remember" class="remember-text">记住我</label>
+                </div>
+                <a href="忘记密码.html" class="forgot-password">忘记密码？</a>
+            </div>
+            
+            <button class="login-button" onclick="login()">登录</button>
+            
+            <div class="register-now">
+                还没有账号？<a href="注册页.html" class="register-link">立即注册</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="login-decoration"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <script>
+        function login() {
+            // 获取输入数据
+            const username = document.querySelector('input[type="text"]').value;
+            const password = document.querySelector('input[type="password"]').value;
+            const remember = document.querySelector('input[type="checkbox"]').checked;
+            
+            if (!username || !password) {
+                // 使用Vant Toast提示
+                vant.showToast('请输入用户名和密码');
+                return;
+            }
+            
+            // 模拟登录请求
+            console.log('登录请求:', { username, password, remember });
+            
+            // 显示加载中
+            vant.showLoadingToast({
+                message: '登录中...',
+                forbidClick: true,
+            });
+            
+            // 模拟网络请求延迟
+            setTimeout(() => {
+                // 隐藏加载提示
+                vant.closeToast();
+                
+                // 假设登录成功，跳转到首页
+                window.location.href = '../首页模块/首页.html';
+                
+                // 如果登录失败可以显示错误信息
+                // vant.showFailToast('用户名或密码错误');
+            }, 1500);
+        }
+    </script>
+</body>
+</html> 
