@@ -393,9 +393,9 @@ CREATE TABLE IF NOT EXISTS `health_goals` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='健康目标表';
 
 
--- 插入初始管理员用户 (密码: admin123)
+-- 插入初始管理员用户 (密码: admin)
 INSERT INTO `users` (`username`, `password`, `email`, `status`)
-VALUES ('admin', '$2a$10$X7aPRV1XN6bBQx8y1oGjMeiR0pLfpL5ZrIlJGoIbi/WfO8T3Dgj9i', 'admin@lovehealth.com', 1);
+VALUES ('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin@lovehealth.com', 1);
 
 -- 插入初始食材分类
 INSERT INTO `ingredient_categories` (`name`, `description`, `parent_id`, `sort_order`)

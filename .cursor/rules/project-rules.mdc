@@ -126,5 +126,4 @@ alwaysApply: false
 - 后端遵循 RESTful API 设计原则
 - 使用 TypeScript 进行类型定义
 
-
 - 遵循模块化和组件化开发

@@ -3,7 +3,7 @@
  */
 
 // 成功响应
-const success = (res, data = null, message = '操作成功', code = 200) => {
+const successResponse = (res, data = null, message = '操作成功', code = 200) => {
   return res.status(code).json({
     code,
     success: true,
@@ -13,8 +13,8 @@ const success = (res, data = null, message = '操作成功', code = 200) => {
   });
 };
 
-// 失败响应
-const error = (res, message = '操作失败', code = 400, data = null) => {
+// 错误响应
+const errorResponse = (res, message = '操作失败', code = 400, data = null) => {
   return res.status(code).json({
     code,
     success: false,
@@ -41,7 +41,7 @@ const httpStatus = {
 };
 
 module.exports = {
-  success,
-  error,
+  successResponse,
+  errorResponse,
   httpStatus
 }; 

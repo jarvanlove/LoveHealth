@@ -1,0 +1,126 @@
+// 响应式断点
+$breakpoints: (
+  'phone': 767px,
+  'tablet': 1024px,
+  'desktop': 1025px,
+);
+
+// 响应式混合器
+@mixin responsive($device) {
+  @if $device == phone {
+    @media screen and (max-width: map-get($breakpoints, 'phone')) {
+      @content;
+    }
+  } @else if $device == tablet {
+    @media screen and (min-width: (map-get($breakpoints, 'phone') + 1)) and (max-width: map-get($breakpoints, 'tablet')) {
+      @content;
+    }
+  } @else if $device == desktop {
+    @media screen and (min-width: map-get($breakpoints, 'desktop')) {
+      @content;
+    }
+  } @else if $device == landscape {
+    @media screen and (orientation: landscape) {
+      @content;
+    }
+  } @else if map-has-key($breakpoints, $device) {
+    @media screen and (max-width: map-get($breakpoints, $device)) {
+      @content;
+    }
+  } @else {
+    @warn "未定义的断点: `#{$device}`。可用的断点是: #{map-keys($breakpoints)}";
+  }
+}
+
+// 安全区域混入
+@mixin safe-area($position) {
+  @if $position == top {
+    padding-top: constant(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top);
+  } @else if $position == bottom {
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
+  } @else if $position == left {
+    padding-left: constant(safe-area-inset-left);
+    padding-left: env(safe-area-inset-left);
+  } @else if $position == right {
+    padding-right: constant(safe-area-inset-right);
+    padding-right: env(safe-area-inset-right);
+  } @else if $position == all {
+    @include safe-area(top);
+    @include safe-area(right);
+    @include safe-area(bottom);
+    @include safe-area(left);
+  }
+}
+
+// 1px 边框适配
+@mixin hairline($position: bottom, $color: #eee) {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    background-color: $color;
+
+    @if $position == top {
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 1px;
+      transform: scaleY(0.5);
+      transform-origin: 0 0;
+    } @else if $position == bottom {
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 1px;
+      transform: scaleY(0.5);
+      transform-origin: 0 100%;
+    } @else if $position == left {
+      left: 0;
+      top: 0;
+      width: 1px;
+      height: 100%;
+      transform: scaleX(0.5);
+      transform-origin: 0 0;
+    } @else if $position == right {
+      right: 0;
+      top: 0;
+      width: 1px;
+      height: 100%;
+      transform: scaleX(0.5);
+      transform-origin: 100% 0;
+    } @else if $position == all {
+      left: 0;
+      top: 0;
+      width: 200%;
+      height: 200%;
+      transform: scale(0.5);
+      transform-origin: 0 0;
+      border: 1px solid $color;
+      pointer-events: none;
+      box-sizing: border-box;
+    }
+  }
+}
+
+// 屏幕适配（根据设计稿比例）
+@function vw($px, $vw-base: 375) {
+  @return ($px / $vw-base) * 100vw;
+}
+
+// 字体响应式
+@mixin font-size($size, $min-size: null, $max-size: null) {
+  font-size: $size;
+
+  @if $min-size and $max-size {
+    @media screen and (max-width: map-get($breakpoints, 'phone')) {
+      font-size: max($min-size, vw($size));
+    }
+
+    @media screen and (min-width: map-get($breakpoints, 'desktop')) {
+      font-size: $max-size;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-const connection = require('../config/database');
+const db = require('../config/database');
 
 /**
  * 基础模型类
@@ -13,6 +13,88 @@ class BaseModel {
   constructor(tableName, primaryKey = 'id') {
     this.tableName = tableName;
     this.primaryKey = primaryKey;
+    this.db = db;
+  }
+
+  /**
+   * 记录SQL日志
+   * @param {string} operation - 操作类型
+   * @param {string} sql - SQL语句
+   * @param {Array} params - 参数
+   * @param {Object|null} error - 错误对象
+   * @param {any} result - 执行结果
+   */
+  logSQL(operation, sql, params, error = null, result = null) {
+    const logInfo = {
+      timestamp: new Date().toISOString(),
+      operation,
+      table: this.tableName,
+      sql,
+      params: params.map(p => typeof p === 'string' ? `'${p}'` : p),
+    };
+
+    if (error) {
+      console.error('\x1b[31m%s\x1b[0m', '数据库操作错误 >>>>>>>>>>>>>>>>>>>>');
+      console.error('操作:', operation);
+      console.error('SQL:', sql);
+      console.error('参数:', params);
+      console.error('错误:', error.message);
+      console.error('\x1b[31m%s\x1b[0m', '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+    } else {
+      console.log('\x1b[32m%s\x1b[0m', '数据库操作成功 >>>>>>>>>>>>>>>>>>>>');
+      console.log('操作:', operation);
+      console.log('SQL:', sql);
+      console.log('参数:', params);
+      if (result) {
+        console.log('影响行数:', Array.isArray(result) ? result.length : result.affectedRows);
+        if (result.insertId) {
+          console.log('新插入ID:', result.insertId);
+        }
+      }
+      console.log('\x1b[32m%s\x1b[0m', '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+    }
+  }
+
+  /**
+   * 执行SQL查询
+   * @param {string} sql - SQL语句
+   * @param {Array} params - 查询参数
+   * @returns {Promise} 查询结果
+   */
+  async query(sql, params = []) {
+    try {
+      const result = await this.db.query(sql, params);
+      this.logSQL('QUERY', sql, params, null, result);
+      return result;
+    } catch (error) {
+      this.logSQL('QUERY', sql, params, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 执行SQL语句
+   * @param {string} sql - SQL语句
+   * @param {Array} params - 查询参数
+   * @returns {Promise} 执行结果
+   */
+  async execute(sql, params = []) {
+    try {
+      const result = await this.db.execute(sql, params);
+      this.logSQL('EXECUTE', sql, params, null, result);
+      return result;
+    } catch (error) {
+      this.logSQL('EXECUTE', sql, params, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 获取数据库连接
+   * @returns {Promise<Connection>} 数据库连接
+   */
+  async getConnection() {
+    return await this.db.getConnection();
   }
 
   /**
@@ -32,7 +114,7 @@ class BaseModel {
         params.push(0);
       }
 
-      const [rows] = await connection.query(sql, params);
+      const rows = await this.query(sql, params);
       return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       console.error(`查询记录错误: ${error.message}`);
@@ -83,7 +165,7 @@ class BaseModel {
       sql += ` LIMIT ? OFFSET ?`;
       queryParams.push(parseInt(limit, 10), parseInt(offset, 10));
 
-      const [rows] = await connection.query(sql, queryParams);
+      const rows = await this.query(sql, queryParams);
       return rows;
     } catch (error) {
       console.error(`查询记录列表错误: ${error.message}`);
@@ -114,7 +196,7 @@ class BaseModel {
         queryParams.push(0);
       }
 
-      const [rows] = await connection.query(sql, queryParams);
+      const rows = await this.query(sql, queryParams);
       return rows[0].total;
     } catch (error) {
       console.error(`计算记录总数错误: ${error.message}`);
@@ -134,7 +216,7 @@ class BaseModel {
       const placeholders = keys.map(() => '?').join(', ');
 
       const sql = `INSERT INTO ${this.tableName} (${keys.join(', ')}) VALUES (${placeholders})`;
-      const [result] = await connection.query(sql, values);
+      const [result] = await this.query(sql, values);
 
       if (result.insertId) {
         return this.findById(result.insertId);
@@ -165,7 +247,7 @@ class BaseModel {
       const sql = `UPDATE ${this.tableName} SET ${setClause} WHERE ${this.primaryKey} = ?`;
 
       values.push(id);
-      const [result] = await connection.query(sql, values);
+      const [result] = await this.query(sql, values);
 
       return {
         affectedRows: result.affectedRows,
@@ -189,7 +271,7 @@ class BaseModel {
       }
 
       const sql = `UPDATE ${this.tableName} SET is_deleted = 1 WHERE ${this.primaryKey} = ?`;
-      const [result] = await connection.query(sql, [id]);
+      const [result] = await this.query(sql, [id]);
 
       return {
         affectedRows: result.affectedRows,
@@ -213,7 +295,7 @@ class BaseModel {
       }
 
       const sql = `UPDATE ${this.tableName} SET is_deleted = 0 WHERE ${this.primaryKey} = ?`;
-      const [result] = await connection.query(sql, [id]);
+      const [result] = await this.query(sql, [id]);
 
       return {
         affectedRows: result.affectedRows,
@@ -233,7 +315,7 @@ class BaseModel {
   async forceDelete(id) {
     try {
       const sql = `DELETE FROM ${this.tableName} WHERE ${this.primaryKey} = ?`;
-      const [result] = await connection.query(sql, [id]);
+      const [result] = await this.query(sql, [id]);
 
       return {
         affectedRows: result.affectedRows
@@ -251,22 +333,6 @@ class BaseModel {
   hasIsDeletedField() {
     // TODO: 实际使用时可以通过查询表结构来检查，或者在构造函数中传入
     return true;
-  }
-
-  /**
-   * 执行自定义SQL语句
-   * @param {string} sql - SQL语句
-   * @param {Array} params - 查询参数
-   * @returns {Promise<Array>} - 查询结果
-   */
-  async query(sql, params = []) {
-    try {
-      const [rows] = await connection.query(sql, params);
-      return rows;
-    } catch (error) {
-      console.error(`执行SQL错误: ${error.message}`);
-      throw error;
-    }
   }
 }
 

@@ -1,0 +1,143 @@
+@import './mixins/_index.scss';
+@import './theme.scss';
+
+// 全局样式
+html,
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  color: #333;
+  background-color: #f8f9fa;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+// 容器样式
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+// 公共过渡效果
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+// 公共动画
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// 页面通用样式
+.page-container {
+  min-height: 100vh;
+  padding-bottom: 60px; // 为底部导航留出空间
+}
+
+// 页面标题样式
+.page-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 20px 0;
+  padding-left: 12px;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 18px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--primary-light));
+    border-radius: 2px;
+  }
+}
+
+// 卡片样式
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+// 按钮样式
+.btn-primary {
+  @include button-style(var(--primary-color));
+}
+
+.btn-danger {
+  @include button-style(var(--danger-color));
+}
+
+// 文本样式
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-danger {
+  color: var(--danger-color);
+}
+
+.text-success {
+  color: var(--success-color);
+}
+
+.text-muted {
+  color: #999;
+}
+
+/* 隐藏调试工具UI */
+#__vconsole, 
+#__eruda,
+.__vconsole_panel,
+.__vconsole_mask,
+.__eruda_panel,
+.__eruda_mask,
+#__vue-devtools-root,
+.__vue-panel,
+.__vue-mask,
+.vue-devtools,
+.vue-devtools-toast {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+}
+
+/* 隐藏图片中红框内的元素 */
+.vue-devtools-switch,
+.debug-tool-button,
+.mobile-debug-tool {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+} 

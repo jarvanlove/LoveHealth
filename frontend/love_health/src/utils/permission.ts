@@ -2,7 +2,8 @@
  * 权限控制工具
  * 提供前端路由权限控制和按钮权限控制功能
  */
-import type { RouteLocationNormalized, NavigationGuardNext, RouteMeta } from 'vue-router'
+//import type { RouteLocationNormalized, NavigationGuardNext, RouteMeta } from 'vue-router'
+import type { RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { showDialog } from 'vant'
 
@@ -24,7 +25,7 @@ const whiteList = ['/login', '/register', '/forget-password', '/404', '/403', '/
  */
 export const permissionGuard = async (
   to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) => {
   const userStore = useUserStore()
@@ -42,7 +43,7 @@ export const permissionGuard = async (
         // 已获取用户信息，检查是否有访问权限
         if (to.meta.roles && to.meta.roles.length > 0) {
           // 判断是否有该路由的访问权限
-          const hasPermission = userStore.roles.some((role: string) => 
+          const hasPermission = userStore.roles.some(role => 
             (to.meta.roles as string[]).includes(role)
           )
           
@@ -59,11 +60,11 @@ export const permissionGuard = async (
       } else {
         try {
           // 未获取用户信息，先获取
-          await userStore.getUserInfo()
+          await userStore.fetchUserInfo()
           
           // 重新判断权限
           if (to.meta.roles && to.meta.roles.length > 0) {
-            const hasPermission = userStore.roles.some((role: string) => 
+            const hasPermission = userStore.roles.some(role => 
               (to.meta.roles as string[]).includes(role)
             )
             

@@ -4,7 +4,28 @@
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
+    <title>爱健康</title>
+    <script>
+      // 禁用可能的调试工具
+      if (window.__VCONSOLE_INSTANCE__ || window.VConsole) {
+        try {
+          if (window.__VCONSOLE_INSTANCE__) window.__VCONSOLE_INSTANCE__.destroy();
+          if (window.VConsole) window.VConsole = undefined;
+        } catch (e) {
+          console.error('Failed to disable VConsole', e);
+        }
+      }
+      
+      // 禁用eruda
+      if (window.eruda) {
+        try {
+          window.eruda.destroy();
+          window.eruda = undefined;
+        } catch (e) {
+          console.error('Failed to disable eruda', e);
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>

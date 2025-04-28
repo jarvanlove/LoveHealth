@@ -89,10 +89,10 @@ class UserController {
    */
   async login(req, res) {
     try {
-      const { username, password, email, phone } = req.body;
+      const { username, password, remember } = req.body;
 
-      // 至少提供一种登录凭证
-      if (!username && !email && !phone) {
+      // 验证必填参数
+      if (!username) {
         return errorResponse(res, '请提供用户名、邮箱或手机号', 400);
       }
 
@@ -102,16 +102,23 @@ class UserController {
 
       let user;
 
-      // 根据提供的凭证查找用户
-      if (username) {
-        user = await UserModel.findByUsername(username);
-      } else if (email) {
-        user = await UserModel.findByEmail(email);
-      } else if (phone) {
-        user = await UserModel.findByPhone(phone);
+      // 根据username字段尝试多种方式查找用户
+      // 1. 尝试作为用户名查找
+      user = await UserModel.findByUsername(username);
+      
+      // 2. 如果未找到，尝试作为邮箱查找
+      if (!user && username.includes('@')) {
+        user = await UserModel.findByEmail(username);
+      }
+      
+      // 3. 如果未找到，尝试作为手机号查找
+      if (!user && /^\d+$/.test(username)) {
+        user = await UserModel.findByPhone(username);
       }
 
-      // 用户不存在或已被逻辑删除（is_deleted = 1）
+      console.info("查找到的用户信息:", JSON.stringify(user));
+
+      // 用户不存在或已被逻辑删除
       if (!user) {
         return errorResponse(res, '用户不存在或账号已被禁用', 404);
       }
@@ -134,10 +141,10 @@ class UserController {
       const { password: _, ...userWithoutPassword } = user;
 
       return successResponse(res, {
-        message: '登录成功',
         user: userWithoutPassword,
-        token
-      });
+        token,
+        remember
+      }, '登录成功');
     } catch (error) {
       console.error('用户登录错误:', error);
       return errorResponse(res, '登录过程中发生错误', 500);

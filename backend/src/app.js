@@ -1,8 +1,9 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const corsMiddleware = require('./middlewares/cors');
-const { testConnection } = require('./config/database');
+const db = require('./config/database');
 const routes = require('./routes');
+const { errorResponse } = require('./utils/response');
 
 // 加载环境变量
 dotenv.config();
@@ -19,7 +20,7 @@ app.use(express.urlencoded({ extended: true })); // 解析URL编码的请求体
 app.use(routes);
 
 // 测试数据库连接
-testConnection()
+db.testConnection()
   .then(connected => {
     if (connected) {
       console.log('数据库连接成功');
@@ -61,11 +62,11 @@ app.get('/test/logic-delete', async (req, res) => {
 // 全局错误处理中间件
 app.use((err, req, res, next) => {
   console.error('服务器错误:', err);
-  res.status(500).json({
-    success: false,
-    message: '服务器内部错误',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
+  return errorResponse(
+    res,
+    process.env.NODE_ENV === 'development' ? err.message : '服务器内部错误',
+    500
+  );
 });
 
 // 端口配置
